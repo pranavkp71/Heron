@@ -22,7 +22,7 @@ def send_events():
                 pass
         
         if config.debug:
-            print("sending events:", events)
+            print(f"[Heron] Sending {len(events)} events")
         
         time.sleep(5)
 

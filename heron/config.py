@@ -1,5 +1,4 @@
 import os
-from .sender import start_sender
 
 class HeronConfig:
     api_key = None
@@ -15,6 +14,8 @@ def init(api_key: str, environment: str = "production", service="app", debug=Fal
     config.environment = environment
     config.service = service
     config.debug = debug
+
+    from .sender import start_sender
 
     start_sender()
     
