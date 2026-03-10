@@ -2,7 +2,7 @@ import os
 
 class HeronConfig:
     api_key = None
-    endpoint = "https://api.heron.dev/v1/events"
+    endpoint = "http://127.0.0.1:8000/v1/events"
     environment = "production"
     service = "app"
     debug = False
