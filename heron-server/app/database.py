@@ -2,8 +2,8 @@ import psycopg2
 
 conn = psycopg2.connect(
     dbname = "heron",
-    user = "postgres",
-    password = "password",
+    user = "pranav",
+    password = "pranav@6321",
     host = "localhost"
 )
 
