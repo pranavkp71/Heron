@@ -1,5 +1,6 @@
 from app.database import get_connection
 from psycopg2.extras import Json
+from app.services.event_stats_service import update_event_stats
 
 def store_events(api_key, events):
 
@@ -24,6 +25,8 @@ def store_events(api_key, events):
                     event["timestamp"]
                 )
             )  
+
+            update_event_stats(api_key, event)
         
         conn.commit()
     
