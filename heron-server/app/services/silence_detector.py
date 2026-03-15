@@ -9,7 +9,7 @@ def detect_silence():
 
     cursor.execute(
         """
-        SELECT api_key, event_name, service, environment, last_seen, avg_interval
+        SELECT api_key, event_name, service, environment, last_seen, avg_interval, incident_active
         FROM event_stats
         """
     )
@@ -20,7 +20,7 @@ def detect_silence():
 
     for row in rows:
 
-        api_key, event_name, service, environment, last_seen, avg_interval = row
+        api_key, event_name, service, environment, last_seen, avg_interval, incident_active = row
 
         if avg_interval == 0:
             continue
@@ -29,7 +29,7 @@ def detect_silence():
 
         threshold = max(avg_interval * 5, 60)
 
-        if gap > threshold:
+        if gap > threshold and not incident_active:
 
             print("SILENCE DETECTED")
 
@@ -37,3 +37,14 @@ def detect_silence():
             print(f"Service: {service}")
             print(f"Environment: {environment}")
             print(f"Stopped for: {gap} seconds")
+
+            cursor.execute(
+                """
+                UPDATE event_stats
+                SET incident_active=TRUE
+                WHERE api_key=%s AND event_name=%s AND service=%s AND environment=%s
+                """,
+                (api_key, event_name, service, environment)
+            )
+
+            conn.commit()
