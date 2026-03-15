@@ -1,20 +1,21 @@
 from app.database import get_connection
 
+
 def update_event_stats(api_key, event):
 
     conn = get_connection()
     cursor = conn.cursor()
 
     event_name = event["event"]
-    service = event.get("server")
+    service = event.get("service")
     environment = event.get("environment")
-    timestamp = event['timestamp']
+    timestamp = event["timestamp"]
 
     cursor.execute(
         """
-        SELECT last_seen, avg_interval_event_count
+        SELECT last_seen, avg_interval, event_count
         FROM event_stats
-        WHERE api_key=%s AND event_name=%s And service=%s AND environment=%s
+        WHERE api_key=%s AND event_name=%s AND service=%s AND environment=%s
         """,
         (api_key, event_name, service, environment)
     )
@@ -22,8 +23,11 @@ def update_event_stats(api_key, event):
     row = cursor.fetchone()
 
     if row:
+
         last_seen, avg_interval, count = row
+
         interval = timestamp - last_seen
+
         new_avg = ((avg_interval or 0) * count + interval) / (count + 1)
 
         cursor.execute(
@@ -34,8 +38,9 @@ def update_event_stats(api_key, event):
             """,
             (timestamp, new_avg, count + 1, api_key, event_name, service, environment)
         )
-    
+
     else:
+
         cursor.execute(
             """
             INSERT INTO event_stats
@@ -44,7 +49,5 @@ def update_event_stats(api_key, event):
             """,
             (api_key, event_name, service, environment, timestamp, 0, 1)
         )
-    
-    conn.commit()
 
-    
+    conn.commit()
