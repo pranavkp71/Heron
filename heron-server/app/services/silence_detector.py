@@ -1,5 +1,9 @@
 import time
 from app.database import get_connection
+from app.services.slack_service import (
+    send_slack_alert, 
+    format_silence_alert
+)
 
 
 def detect_silence():
@@ -31,12 +35,19 @@ def detect_silence():
 
         if gap > threshold and not incident_active:
 
-            print("SILENCE DETECTED")
+            message = format_silence_alert(
+                event_name=event_name,
+                service=service,
+                environment=environment,
+                gap_seconds=gap,
+                avg_interval=avg_interval,
+                last_seen=last_seen
 
-            print(f"Event: {event_name}")
-            print(f"Service: {service}")
-            print(f"Environment: {environment}")
-            print(f"Stopped for: {gap} seconds")
+            )
+            print(message)
+
+            send_slack_alert(message)
+
 
             cursor.execute(
                 """
