@@ -8,7 +8,7 @@ init(
 )
 
 while True:
-    track("login_evnet", user_id=3)
+    track("account.event", user_id=3)
     time.sleep(1)
 
 

@@ -1,3 +1,6 @@
 import os
+from dotenv import load_dotenv, find_dotenv
 
-SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
+load_dotenv(find_dotenv())
+
+SLACK_WEBHOOK_URL = os.getenv('SLACK_WEBHOOK_URL')

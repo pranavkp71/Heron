@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 def send_slack_alert(message: str):
+
     if not SLACK_WEBHOOK_URL:
         return
     
@@ -28,16 +29,17 @@ def format_silence_alert(
     gap_minutes = int(gap_seconds / 60)
     excepted_minutes = max(int(avg_interval / 60), 1)
 
-    last_seen = datetime.fromtimestamp(last_seen)
+    last_seen_time = datetime.fromtimestamp(last_seen)
     
     return f"""
 🚨 *Heron Alert*
 
-Event: `{event_name}`
-Service: `{service}`
-Environment: `{environment}`
+*Event:* `{event_name}`
+*Service:* `{service}`
+*Environment:* `{environment}`
 
-Last_seen: {gap_minutes} minutes ago
-Excepted interval: ~{avg_interval} seconds
+*Last_seen:* {last_seen_time}
+*Expected interval:* ~{excepted_minutes} minutes
+*Silence detected for:* {gap_minutes} minutes
 
 """
