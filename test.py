@@ -19,7 +19,7 @@ for i in range(5):
     res = requests.post("http://localhost:8000/v1/events", json=payload)
     print(res.json())
 
-    time.sleep(5)  # send every 10 sec
+    time.sleep(5)
 
 
 
