@@ -46,3 +46,18 @@ def format_silence_alert(
 *Silence detected for:* {gap_minutes} minutes
 
 """
+
+def format_recovery_alert(event_name, duration):
+
+    minutes = int(duration / 60)
+
+    return f"""
+✅ *Heron Recovery*
+
+*Event:* `{event_name}`
+
+*Events resumed.*
+
+*Downtime:* {minutes} minutes
+
+"""
