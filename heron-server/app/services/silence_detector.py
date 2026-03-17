@@ -102,3 +102,5 @@ def detect_silence():
                 """,
                 (api_key, event_name, service, environment)
             )
+
+            conn.commit()

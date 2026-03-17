@@ -8,7 +8,7 @@ for i in range(5):
         "api_key": API_KEY,
         "events": [
             {
-                "event_name": "login.completed",
+                "event_name": "lockup.event",
                 "service": "api",
                 "environment": "production",
                 "timestamp": int(time.time())
@@ -19,7 +19,7 @@ for i in range(5):
     res = requests.post("http://localhost:8000/v1/events", json=payload)
     print(res.json())
 
-    time.sleep(5)
+    time.sleep(10)
 
 
 

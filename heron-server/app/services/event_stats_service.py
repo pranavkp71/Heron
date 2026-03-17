@@ -33,7 +33,7 @@ def update_event_stats(api_key, event):
         cursor.execute(
             """
             UPDATE event_stats
-            SET last_seen=%s, avg_interval=%s, event_count=%s, incident_active=FALSE
+            SET last_seen=%s, avg_interval=%s, event_count=%s
             WHERE api_key=%s AND event_name=%s AND service=%s AND environment=%s
             """,
             (timestamp, new_avg, count + 1, api_key, event_name, service, environment)
