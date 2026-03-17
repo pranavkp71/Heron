@@ -13,8 +13,17 @@ def detect_silence():
 
     cursor.execute(
         """
-        SELECT api_key, event_name, service, environment, last_seen, avg_interval, incident_active
-        FROM event_stats
+        SELECT 
+            es.api_key, 
+            es.event_name, 
+            es.service, 
+            es.environment, 
+            es.last_seen, 
+            es.avg_interval,
+            es.incident_active,
+            p.slack_webhook_url
+        FROM event_stats es
+        JOIN projects p ON es.api_key = p.api_key
         """
     )
 
@@ -24,7 +33,16 @@ def detect_silence():
 
     for row in rows:
 
-        api_key, event_name, service, environment, last_seen, avg_interval, incident_active = row
+        (
+            api_key, 
+            event_name, 
+            service, 
+            environment, 
+            last_seen, 
+            avg_interval, 
+            incident_active,
+            slack_webhook_url
+        ) = row
 
         if avg_interval == 0:
             continue
@@ -46,7 +64,7 @@ def detect_silence():
             )
             print(message)
 
-            send_slack_alert(message)
+            send_slack_alert(message, slack_webhook_url)
 
 
             cursor.execute(

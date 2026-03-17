@@ -3,9 +3,11 @@ from app.config import SLACK_WEBHOOK_URL
 from datetime import datetime
 
 
-def send_slack_alert(message: str):
+
+def send_slack_alert(message: str, webhook_url: str):
 
     if not SLACK_WEBHOOK_URL:
+        print("No webhook for project")
         return
     
     payload = {
@@ -13,7 +15,8 @@ def send_slack_alert(message: str):
     }
 
     try:
-        requests.post(SLACK_WEBHOOK_URL, json=payload, timeout=5)
+        response = requests.post(webhook_url, json=payload, timeout=5)
+        print("Slack status:", response.status_code)
     except Exception as e:
         print("Slack alert failed:", e)
 
