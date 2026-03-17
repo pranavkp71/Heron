@@ -4,6 +4,10 @@ from app.services.slack_service import (
     send_slack_alert, 
     format_silence_alert
 )
+from app.services.incident_service import (
+    create_incident, 
+    resolve_incident
+)
 
 
 def detect_silence():
@@ -66,6 +70,7 @@ def detect_silence():
 
             send_slack_alert(message, slack_webhook_url)
 
+            create_incident(api_key, event_name, service, environment)
 
             cursor.execute(
                 """
@@ -77,3 +82,19 @@ def detect_silence():
             )
 
             conn.commit()
+        
+        elif gap <= threshold and incident_active:
+            duration = resolve_incident(api_key, event_name, service, environment)
+            print("INCIDENT RESOLVED")
+
+            print(f"Event: {event_name}")
+            print(f"Recovered after: {int(duration/60)} minutes")
+
+            cursor.execute(
+                """
+                UPDATE event_stats
+                SET incident_active=FALSE
+                WHERE api_key=%s AND event_name=%s AND service=%s AND environment=%s
+                """,
+                (api_key, event_name, service, environment)
+            )
