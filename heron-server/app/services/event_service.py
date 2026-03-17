@@ -18,7 +18,7 @@ def store_events(api_key, events):
                 """,
                 (
                     api_key,
-                    event["event"],
+                    event["event_name"],
                     event.get("service"),
                     event.get("environment"),
                     Json(event.get("metadata", {})),

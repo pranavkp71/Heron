@@ -6,7 +6,7 @@ def update_event_stats(api_key, event):
     conn = get_connection()
     cursor = conn.cursor()
 
-    event_name = event["event"]
+    event_name = event["event_name"]
     service = event.get("service")
     environment = event.get("environment")
     timestamp = event["timestamp"]
