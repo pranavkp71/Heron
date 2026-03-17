@@ -12,7 +12,7 @@ def create_project(name: str):
     cursor.execute(
         """
         INSERT INTO projects (name, api_key)
-        VALUES (%, %)
+        VALUES (%s, %s)
         RETURNING id, api_key
         """,
         (name, api_key)
