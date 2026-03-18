@@ -10,6 +10,7 @@ from app.services.incident_service import (
     resolve_incident
 )
 
+MIN_EVENT_COUNT = 10
 
 def detect_silence():
 
@@ -25,6 +26,7 @@ def detect_silence():
             es.environment, 
             es.last_seen, 
             es.avg_interval,
+            es.event_count,
             es.incident_active,
             p.slack_webhook_url
         FROM event_stats es
@@ -44,11 +46,15 @@ def detect_silence():
             service, 
             environment, 
             last_seen, 
-            avg_interval, 
+            avg_interval,
+            event_count, 
             incident_active,
             slack_webhook_url
         ) = row
 
+        if event_count < MIN_EVENT_COUNT:
+            continue
+        
         if avg_interval == 0:
             continue
 
