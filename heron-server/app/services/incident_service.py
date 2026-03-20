@@ -59,3 +59,63 @@ def resolve_incident(api_key, event_name, service, environment):
     conn.commit()
 
     return duration
+
+def get_all_incidents(api_key):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT event_name, service, environment, started_at, resolved_at, duration
+        FROM incidents
+        WHERE api_key=%s
+        ORDER BY started_at DESC
+        """,
+        (api_key,)
+    )
+
+    rows = cursor.fetchall()
+
+    incidents = []
+
+    for row in rows:
+        incidents.append({
+            "event_name": row[0],
+            "service": row[1],
+            "environment": row[2],
+            "started_at": row[3],
+            "resolved_at": row[4],
+            "duration": row[5],
+        })
+
+    return incidents
+
+def get_active_incidents(api_key):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT event_name, service, environment, started_at
+        FROM incidents
+        WHERE api_key=%s AND resolved_at IS NULL
+        ORDER BY started_at DESC
+        """,
+        (api_key,)
+    )
+
+    rows = cursor.fetchall()
+
+    incidents = []
+
+    for row in rows:
+        incidents.append({
+            "event_name": row[0],
+            "service": row[1],
+            "environment": row[2],
+            "started_at": row[3],
+        })
+
+    return incidents
