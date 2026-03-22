@@ -60,6 +60,14 @@ Downtime: 18 minutes
 ```
 
 ---
+## Example Alert
+
+<p align="center">
+  <img src="assets/slack-alert.png" width="700" />
+</p>
+
+---
+
 
 ## How It Works
 
@@ -246,7 +254,7 @@ GET /v1/incidents/active?api_key=YOUR_KEY
 
 ---
 
-## 🎯 Current Status
+## Current Status
 
 Heron is in early development.
 
