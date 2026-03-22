@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/heron-logo.png" width="140" />
+</p>
+
 # Heron — Business Event Monitoring for SaaS
 
 > Detect when your business workflows silently break.
