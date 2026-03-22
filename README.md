@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/heron-logo.jpeg" width="100%" />
+  <img src="assets/heron-logo.png" width="100%" />
 </p>
 
 # Heron — Business Event Monitoring for SaaS
