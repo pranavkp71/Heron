@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/heron-logo.jpeg" width="140" />
+  <img src="assets/heron-logo.jpeg" width="100%" />
 </p>
 
 # Heron — Business Event Monitoring for SaaS
@@ -61,7 +61,7 @@ Downtime: 18 minutes
 
 ---
 
-## ⚙️ How It Works
+## How It Works
 
 ```text
 Your App → Heron SDK → Heron Server → Pattern Learning → Silence Detection → Slack Alerts
