@@ -2,8 +2,8 @@ from app.database import get_connection
 from app.utils.api_key import generate_api_key
 
 
-def create_project(name: str, slack_webhook_url: str = None):
-    
+def create_project(name: str, slack_webhook_url: str = None, user_id: int = None):
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -11,11 +11,11 @@ def create_project(name: str, slack_webhook_url: str = None):
 
     cursor.execute(
         """
-        INSERT INTO projects (name, api_key, slack_webhook_url)
-        VALUES (%s, %s, %s)
+        INSERT INTO projects (name, api_key, slack_webhook_url, user_id)
+        VALUES (%s, %s, %s, %s)
         RETURNING id, api_key
         """,
-        (name, api_key, slack_webhook_url)
+        (name, api_key, slack_webhook_url, user_id)
     )
 
     project = cursor.fetchone()
