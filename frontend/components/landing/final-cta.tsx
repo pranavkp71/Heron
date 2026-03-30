@@ -1,0 +1,43 @@
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { ArrowRight } from "lucide-react"
+
+export function FinalCTA() {
+  return (
+    <section className="border-t border-border py-20 md:py-32">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
+          {/* Background gradient */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+
+          <div className="relative px-6 py-16 text-center md:px-12 md:py-24">
+            <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
+              Start monitoring your business flows today
+            </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground">
+              Join hundreds of teams who trust Heron to catch the silent
+              failures that traditional monitoring misses.
+            </p>
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href="/login?signup=true">
+                <Button size="lg" className="group h-12 px-8 text-base">
+                  Get Started Free
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+              <Link href="/setup">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-12 px-8 text-base border-border text-foreground hover:bg-secondary"
+                >
+                  View Documentation
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
