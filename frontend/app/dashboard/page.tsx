@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { animate, motion } from "framer-motion"
 import {
   Select,
   SelectContent,
@@ -68,13 +69,76 @@ const mockRecentIncidents: Incident[] = [
   },
 ]
 
+function CountUpInt({ value }: { value: number }) {
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    const controls = animate(0, value, {
+      duration: 0.8,
+      ease: [0.2, 0.8, 0.2, 1],
+      onUpdate: (latest) => setDisplay(latest),
+    })
+
+    return () => controls.stop()
+  }, [value])
+
+  return (
+    <>
+      {new Intl.NumberFormat("en-US").format(Math.round(display))}
+    </>
+  )
+}
+
+function CountUpFloat({
+  value,
+  decimals,
+  suffix = "",
+}: {
+  value: number
+  decimals: number
+  suffix?: string
+}) {
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    const controls = animate(0, value, {
+      duration: 0.8,
+      ease: [0.2, 0.8, 0.2, 1],
+      onUpdate: (latest) => setDisplay(latest),
+    })
+
+    return () => controls.stop()
+  }, [value])
+
+  return <>{display.toFixed(decimals)}{suffix}</>
+}
+
 export default function DashboardPage() {
   const [activeIncidents] = useState<Incident[]>(mockActiveIncidents)
   const [recentIncidents] = useState<Incident[]>(mockRecentIncidents)
   const [showEmptyState, setShowEmptyState] = useState(false)
 
+  const listVariants = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.07 } },
+  }
+
+  const listItemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] },
+    },
+  }
+
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div
+      className="min-h-screen bg-background"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+    >
       {/* Top Navigation */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
@@ -123,7 +187,12 @@ export default function DashboardPage() {
 
       <main className="mx-auto max-w-7xl px-6 py-8">
         {/* Page Header */}
-        <div className="flex items-center justify-between">
+        <motion.div
+          className="flex items-center justify-between"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1], delay: 0.05 }}
+        >
           <div>
             <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -143,11 +212,16 @@ export default function DashboardPage() {
               Add Event
             </Button>
           </div>
-        </div>
+        </motion.div>
 
         {showEmptyState ? (
           /* Empty State */
-          <div className="mt-12 flex flex-col items-center justify-center rounded-xl border border-border bg-card p-16 text-center">
+          <motion.div
+            className="mt-12 flex flex-col items-center justify-center rounded-xl border border-border bg-card p-16 text-center"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+          >
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10">
               <Shield className="h-8 w-8 text-emerald-500" />
             </div>
@@ -164,12 +238,17 @@ export default function DashboardPage() {
                 All systems operational
               </span>
             </div>
-          </div>
+          </motion.div>
         ) : (
           <>
             {/* Active Incidents */}
             {activeIncidents.length > 0 && (
-              <section className="mt-8">
+              <motion.section
+                className="mt-8"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+              >
                 <div className="flex items-center gap-2">
                   <div className="relative flex h-3 w-3">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
@@ -183,11 +262,17 @@ export default function DashboardPage() {
                   </span>
                 </div>
 
-                <div className="mt-4 space-y-3">
+                <motion.div
+                  className="mt-4 space-y-3"
+                  variants={listVariants}
+                  initial="hidden"
+                  animate="show"
+                >
                   {activeIncidents.map((incident) => (
-                    <div
+                    <motion.div
                       key={incident.id}
-                      className="group relative overflow-hidden rounded-xl border border-primary/50 bg-card transition-all hover:border-primary"
+                      className="group relative overflow-hidden rounded-xl border border-primary/50 bg-card transition-all hover:border-primary hover:-translate-y-1 hover:shadow-md"
+                      variants={listItemVariants}
                     >
                       {/* Pulse animation on left */}
                       <div className="absolute left-0 top-0 h-full w-1 bg-primary" />
@@ -204,7 +289,18 @@ export default function DashboardPage() {
                                 {incident.event}
                               </h3>
                               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                                <motion.span
+                                  className="h-1.5 w-1.5 rounded-full bg-primary"
+                                  animate={{
+                                    scale: [1, 1.2, 1],
+                                    opacity: [0.85, 1, 0.85],
+                                  }}
+                                  transition={{
+                                    repeat: Infinity,
+                                    duration: 1.6,
+                                    ease: "easeInOut",
+                                  }}
+                                />
                                 Active
                               </span>
                             </div>
@@ -241,14 +337,19 @@ export default function DashboardPage() {
                           </Button>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
-              </section>
+                </motion.div>
+              </motion.section>
             )}
 
             {/* Recent Incidents */}
-            <section className="mt-10">
+            <motion.section
+              className="mt-10"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Clock className="h-5 w-5 text-muted-foreground" />
@@ -287,10 +388,17 @@ export default function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {recentIncidents.map((incident) => (
-                      <tr
+                    {recentIncidents.map((incident, index) => (
+                      <motion.tr
                         key={incident.id}
                         className="transition-colors hover:bg-secondary/30"
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.45,
+                          ease: [0.2, 0.8, 0.2, 1],
+                          delay: index * 0.06,
+                        }}
                       >
                         <td className="whitespace-nowrap px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -321,17 +429,30 @@ export default function DashboardPage() {
                             Details
                           </Button>
                         </td>
-                      </tr>
+                      </motion.tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </section>
+            </motion.section>
 
             {/* Quick Stats */}
-            <section className="mt-10">
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="rounded-xl border border-border bg-card p-6">
+            <motion.section
+              className="mt-10"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+            >
+              <motion.div
+                className="grid gap-4 md:grid-cols-3"
+                variants={listVariants}
+                initial="hidden"
+                animate="show"
+              >
+                <motion.div
+                  className="rounded-xl border border-border bg-card p-6 transition-transform hover:-translate-y-1 hover:shadow-md"
+                  variants={listItemVariants}
+                >
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-muted-foreground">
                       Active Incidents
@@ -339,14 +460,17 @@ export default function DashboardPage() {
                     <AlertTriangle className="h-5 w-5 text-primary" />
                   </div>
                   <p className="mt-2 text-3xl font-bold text-foreground">
-                    {activeIncidents.length}
+                    <CountUpInt value={activeIncidents.length} />
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Requires attention
                   </p>
-                </div>
+                </motion.div>
 
-                <div className="rounded-xl border border-border bg-card p-6">
+                <motion.div
+                  className="rounded-xl border border-border bg-card p-6 transition-transform hover:-translate-y-1 hover:shadow-md"
+                  variants={listItemVariants}
+                >
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-muted-foreground">
                       Events Tracked
@@ -354,14 +478,17 @@ export default function DashboardPage() {
                     <Activity className="h-5 w-5 text-emerald-500" />
                   </div>
                   <p className="mt-2 text-3xl font-bold text-foreground">
-                    12,847
+                    <CountUpInt value={12847} />
                   </p>
                   <p className="mt-1 text-xs text-emerald-500">
                     +23% from last week
                   </p>
-                </div>
+                </motion.div>
 
-                <div className="rounded-xl border border-border bg-card p-6">
+                <motion.div
+                  className="rounded-xl border border-border bg-card p-6 transition-transform hover:-translate-y-1 hover:shadow-md"
+                  variants={listItemVariants}
+                >
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-muted-foreground">
                       Avg Response Time
@@ -369,18 +496,18 @@ export default function DashboardPage() {
                     <Clock className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <p className="mt-2 text-3xl font-bold text-foreground">
-                    4.2 min
+                    <CountUpFloat value={4.2} decimals={1} suffix=" min" />
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Time to resolution
                   </p>
-                </div>
-              </div>
-            </section>
+                </motion.div>
+              </motion.div>
+            </motion.section>
           </>
         )}
       </main>
-    </div>
+    </motion.div>
   )
 }
 

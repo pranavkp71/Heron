@@ -1,3 +1,6 @@
+"use client"
+
+import { motion } from "framer-motion"
 import { XCircle, Mail, Cog } from "lucide-react"
 
 const problems = [
@@ -22,8 +25,24 @@ const problems = [
 ]
 
 export function Problem() {
+  const containerVariants = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.07 } },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 14 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] } },
+  }
+
   return (
-    <section id="features" className="border-t border-border py-20 md:py-32">
+    <motion.section
+      id="features"
+      className="border-t border-border py-20 md:py-32"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+    >
       <div className="mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -35,11 +54,17 @@ export function Problem() {
           </p>
         </div>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-3">
+        <motion.div
+          className="mt-16 grid gap-8 md:grid-cols-3"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
           {problems.map((problem) => (
-            <div
+            <motion.div
               key={problem.title}
-              className="group relative rounded-xl border border-border bg-card p-6 transition-all hover:border-primary/50 hover:bg-card/80"
+              className="group relative rounded-xl border border-border bg-card p-6 transition-all hover:border-primary/50 hover:bg-card/80 hover:-translate-y-1 hover:shadow-md"
+              variants={itemVariants}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
                 <problem.icon className="h-6 w-6" />
@@ -50,10 +75,10 @@ export function Problem() {
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {problem.description}
               </p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }

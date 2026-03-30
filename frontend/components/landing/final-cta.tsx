@@ -1,16 +1,29 @@
+"use client"
+
+import { motion } from "framer-motion"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 
 export function FinalCTA() {
   return (
-    <section className="border-t border-border py-20 md:py-32">
+    <motion.section
+      className="border-t border-border py-20 md:py-32"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+    >
       <div className="mx-auto max-w-6xl px-6">
         <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
           {/* Background gradient */}
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
 
-          <div className="relative px-6 py-16 text-center md:px-12 md:py-24">
+          <motion.div
+            className="relative px-6 py-16 text-center md:px-12 md:py-24"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05, ease: [0.2, 0.8, 0.2, 1] }}
+          >
             <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
               Start monitoring your business flows today
             </h2>
@@ -35,9 +48,9 @@ export function FinalCTA() {
                 </Button>
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   )
 }

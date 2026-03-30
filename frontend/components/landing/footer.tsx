@@ -1,3 +1,6 @@
+"use client"
+
+import { motion } from "framer-motion"
 import Link from "next/link"
 
 const footerLinks = {
@@ -21,12 +24,32 @@ const footerLinks = {
 }
 
 export function Footer() {
+  const containerVariants = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.06 } },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.2, 0.8, 0.2, 1] } },
+  }
+
   return (
-    <footer className="border-t border-border bg-card/50">
+    <motion.footer
+      className="border-t border-border bg-card/50"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+    >
       <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <motion.div
+          className="grid gap-8 md:grid-cols-2 lg:grid-cols-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
           {/* Brand */}
-          <div className="lg:col-span-1">
+          <motion.div className="lg:col-span-1" variants={itemVariants}>
             <Link href="/" className="flex items-center gap-2">
               <HeronLogo />
               <span className="text-lg font-semibold tracking-tight text-foreground">
@@ -37,10 +60,10 @@ export function Footer() {
               Know when your business silently breaks. Detect when critical
               events stop happening.
             </p>
-          </div>
+          </motion.div>
 
           {/* Links */}
-          <div>
+          <motion.div variants={itemVariants}>
             <h3 className="text-sm font-semibold text-foreground">Product</h3>
             <ul className="mt-4 space-y-3">
               {footerLinks.product.map((link) => (
@@ -54,9 +77,9 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div variants={itemVariants}>
             <h3 className="text-sm font-semibold text-foreground">Company</h3>
             <ul className="mt-4 space-y-3">
               {footerLinks.company.map((link) => (
@@ -70,9 +93,9 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div variants={itemVariants}>
             <h3 className="text-sm font-semibold text-foreground">Legal</h3>
             <ul className="mt-4 space-y-3">
               {footerLinks.legal.map((link) => (
@@ -86,8 +109,8 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
           <p className="text-sm text-muted-foreground">
@@ -119,7 +142,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   )
 }
 

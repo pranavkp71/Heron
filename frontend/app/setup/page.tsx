@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Rocket,
 } from "lucide-react"
+import { AnimatePresence, motion } from "framer-motion"
 
 const steps = [
   { id: 1, title: "Create Project", icon: Key },
@@ -49,8 +50,11 @@ heron.track("payment.completed")`
     setTimeout(() => setCodeCopied(false), 2000)
   }
 
+  const directionRef = useRef<1 | -1>(1)
+
   const nextStep = () => {
     if (currentStep < 4) {
+      directionRef.current = 1
       setCurrentStep(currentStep + 1)
     } else {
       window.location.href = "/dashboard"
@@ -59,8 +63,21 @@ heron.track("payment.completed")`
 
   const prevStep = () => {
     if (currentStep > 1) {
+      directionRef.current = -1
       setCurrentStep(currentStep - 1)
     }
+  }
+
+  const stepDir = directionRef.current
+
+  const progressContainerVariants = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.08 } },
+  }
+
+  const progressItemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.2, 0.8, 0.2, 1] } },
   }
 
   return (
@@ -83,14 +100,28 @@ heron.track("payment.completed")`
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-12">
+      <motion.main
+        className="mx-auto max-w-4xl px-6 py-12"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+      >
         {/* Progress Steps */}
         <div className="mb-12">
-          <div className="flex items-center justify-between">
+          <motion.div
+            className="flex items-center justify-between"
+            variants={progressContainerVariants}
+            initial="hidden"
+            animate="show"
+          >
             {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
+              <motion.div
+                key={step.id}
+                className="flex items-center"
+                variants={progressItemVariants}
+              >
                 <div className="flex flex-col items-center">
-                  <div
+                  <motion.div
                     className={`flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all ${
                       currentStep > step.id
                         ? "border-primary bg-primary text-primary-foreground"
@@ -98,13 +129,21 @@ heron.track("payment.completed")`
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border bg-card text-muted-foreground"
                     }`}
+                    animate={{
+                      scale:
+                        currentStep === step.id ? 1.08 : currentStep > step.id ? 1.03 : 1,
+                    }}
+                    transition={{
+                      duration: 0.25,
+                      ease: [0.2, 0.8, 0.2, 1],
+                    }}
                   >
                     {currentStep > step.id ? (
                       <Check className="h-5 w-5" />
                     ) : (
                       <step.icon className="h-5 w-5" />
                     )}
-                  </div>
+                  </motion.div>
                   <span
                     className={`mt-2 text-xs font-medium ${
                       currentStep >= step.id
@@ -122,16 +161,34 @@ heron.track("payment.completed")`
                     }`}
                   />
                 )}
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
 
         {/* Step Content */}
         <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <AnimatePresence mode="wait">
           {/* Step 1: Create Project */}
           {currentStep === 1 && (
-            <div className="p-8">
+            <motion.div
+              key="step-1"
+              className="p-8"
+              initial={{
+                opacity: 0,
+                x: stepDir > 0 ? 24 : -24,
+                y: 10,
+                scale: 0.99,
+              }}
+              animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              exit={{
+                opacity: 0,
+                x: stepDir > 0 ? -24 : 24,
+                y: 10,
+                scale: 0.99,
+              }}
+              transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+            >
               <h2 className="text-2xl font-bold text-foreground">
                 Create your project
               </h2>
@@ -163,17 +220,39 @@ heron.track("payment.completed")`
                         onClick={copyApiKey}
                         className="absolute right-1 top-1/2 -translate-y-1/2 h-8 px-3 text-xs text-muted-foreground hover:text-foreground"
                       >
-                        {apiKeyCopied ? (
-                          <>
-                            <Check className="mr-1.5 h-3 w-3 text-emerald-500" />
-                            Copied
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="mr-1.5 h-3 w-3" />
-                            Copy
-                          </>
-                        )}
+                        <AnimatePresence mode="wait" initial={false}>
+                          {apiKeyCopied ? (
+                            <motion.span
+                              key="copied"
+                              className="inline-flex items-center"
+                              initial={{ opacity: 0, y: 4, scale: 0.98 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                              transition={{
+                                duration: 0.2,
+                                ease: [0.2, 0.8, 0.2, 1],
+                              }}
+                            >
+                              <Check className="mr-1.5 h-3 w-3 text-emerald-500" />
+                              Copied
+                            </motion.span>
+                          ) : (
+                            <motion.span
+                              key="copy"
+                              className="inline-flex items-center"
+                              initial={{ opacity: 0, y: 4, scale: 0.98 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                              transition={{
+                                duration: 0.2,
+                                ease: [0.2, 0.8, 0.2, 1],
+                              }}
+                            >
+                              <Copy className="mr-1.5 h-3 w-3" />
+                              Copy
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
                       </Button>
                     </div>
                   </div>
@@ -182,12 +261,29 @@ heron.track("payment.completed")`
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Step 2: Add SDK */}
           {currentStep === 2 && (
-            <div className="p-8">
+            <motion.div
+              key="step-2"
+              className="p-8"
+              initial={{
+                opacity: 0,
+                x: stepDir > 0 ? 24 : -24,
+                y: 10,
+                scale: 0.99,
+              }}
+              animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              exit={{
+                opacity: 0,
+                x: stepDir > 0 ? -24 : 24,
+                y: 10,
+                scale: 0.99,
+              }}
+              transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+            >
               <h2 className="text-2xl font-bold text-foreground">
                 Add the Heron SDK
               </h2>
@@ -225,17 +321,39 @@ heron.track("payment.completed")`
                       onClick={copyCode}
                       className="absolute right-2 top-2 h-8 px-3 text-xs text-muted-foreground hover:text-foreground"
                     >
-                      {codeCopied ? (
-                        <>
-                          <Check className="mr-1.5 h-3 w-3 text-emerald-500" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="mr-1.5 h-3 w-3" />
-                          Copy
-                        </>
-                      )}
+                      <AnimatePresence mode="wait" initial={false}>
+                        {codeCopied ? (
+                          <motion.span
+                            key="copied"
+                            className="inline-flex items-center"
+                            initial={{ opacity: 0, y: 4, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                            transition={{
+                              duration: 0.2,
+                              ease: [0.2, 0.8, 0.2, 1],
+                            }}
+                          >
+                            <Check className="mr-1.5 h-3 w-3 text-emerald-500" />
+                            Copied
+                          </motion.span>
+                        ) : (
+                          <motion.span
+                            key="copy"
+                            className="inline-flex items-center"
+                            initial={{ opacity: 0, y: 4, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                            transition={{
+                              duration: 0.2,
+                              ease: [0.2, 0.8, 0.2, 1],
+                            }}
+                          >
+                            <Copy className="mr-1.5 h-3 w-3" />
+                            Copy
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </Button>
                   </div>
                 </div>
@@ -248,12 +366,29 @@ heron.track("payment.completed")`
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Step 3: Add Slack */}
           {currentStep === 3 && (
-            <div className="p-8">
+            <motion.div
+              key="step-3"
+              className="p-8"
+              initial={{
+                opacity: 0,
+                x: stepDir > 0 ? 24 : -24,
+                y: 10,
+                scale: 0.99,
+              }}
+              animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              exit={{
+                opacity: 0,
+                x: stepDir > 0 ? -24 : 24,
+                y: 10,
+                scale: 0.99,
+              }}
+              transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+            >
               <h2 className="text-2xl font-bold text-foreground">
                 Add Slack notifications
               </h2>
@@ -307,12 +442,29 @@ heron.track("payment.completed")`
                   settings.
                 </p>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Step 4: Done */}
           {currentStep === 4 && (
-            <div className="p-8 text-center">
+            <motion.div
+              key="step-4"
+              className="p-8 text-center"
+              initial={{
+                opacity: 0,
+                x: stepDir > 0 ? 24 : -24,
+                y: 10,
+                scale: 0.99,
+              }}
+              animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              exit={{
+                opacity: 0,
+                x: stepDir > 0 ? -24 : 24,
+                y: 10,
+                scale: 0.99,
+              }}
+              transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+            >
               <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
                 <Check className="h-10 w-10 text-primary" />
               </div>
@@ -347,8 +499,10 @@ heron.track("payment.completed")`
                   </li>
                 </ul>
               </div>
-            </div>
+            </motion.div>
           )}
+
+          </AnimatePresence>
 
           {/* Footer */}
           <div className="flex items-center justify-between border-t border-border bg-card/50 px-8 py-4">
@@ -369,7 +523,7 @@ heron.track("payment.completed")`
             </Button>
           </div>
         </div>
-      </main>
+      </motion.main>
     </div>
   )
 }

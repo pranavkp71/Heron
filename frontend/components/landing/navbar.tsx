@@ -1,11 +1,27 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export function Navbar() {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
+    <header
+      className={cn(
+        "fixed top-0 z-50 w-full border-b border-border/50 backdrop-blur-md transition-[background-color,box-shadow] duration-300",
+        scrolled ? "bg-background/90 shadow-xs" : "bg-background/80"
+      )}
+    >
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2">
           <HeronLogo />
@@ -17,19 +33,19 @@ export function Navbar() {
         <div className="hidden items-center gap-8 md:flex">
           <Link
             href="#how-it-works"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="relative text-sm text-muted-foreground transition-colors hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full after:rounded-full after:bg-primary/70 after:content-[''] after:origin-left after:scale-x-0 after:transition-transform after:duration-200 hover:after:scale-x-100"
           >
             How it works
           </Link>
           <Link
             href="#features"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="relative text-sm text-muted-foreground transition-colors hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full after:rounded-full after:bg-primary/70 after:content-[''] after:origin-left after:scale-x-0 after:transition-transform after:duration-200 hover:after:scale-x-100"
           >
             Features
           </Link>
           <Link
             href="#pricing"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="relative text-sm text-muted-foreground transition-colors hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full after:rounded-full after:bg-primary/70 after:content-[''] after:origin-left after:scale-x-0 after:transition-transform after:duration-200 hover:after:scale-x-100"
           >
             Pricing
           </Link>

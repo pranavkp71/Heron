@@ -2,11 +2,17 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { motion } from "framer-motion"
 import { AlertTriangle, ArrowRight } from "lucide-react"
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-32">
+    <motion.section
+      className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-32"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+    >
       {/* Subtle gradient background */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
       
@@ -54,7 +60,12 @@ export function Hero() {
         </div>
 
         {/* Mock Alert UI */}
-        <div className="mt-20 flex justify-center">
+        <motion.div
+          className="mt-20 flex justify-center"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.08, ease: [0.2, 0.8, 0.2, 1] }}
+        >
           <div className="relative">
             {/* Glow effect */}
             <div className="absolute -inset-4 rounded-2xl bg-primary/10 blur-2xl" />
@@ -88,8 +99,8 @@ export function Hero() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }

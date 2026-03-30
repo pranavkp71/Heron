@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { motion } from "framer-motion"
 import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 
 function LoginForm() {
@@ -31,7 +32,12 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div
+      className="min-h-screen bg-background"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+    >
       <div className="grid min-h-screen lg:grid-cols-2">
         {/* Left side - Branding */}
         <div className="relative hidden flex-col justify-between border-r border-border bg-card p-12 lg:flex">
@@ -238,7 +244,7 @@ function LoginForm() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

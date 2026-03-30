@@ -1,10 +1,27 @@
 "use client"
 
+import { motion } from "framer-motion"
 import { AlertTriangle, CheckCircle2 } from "lucide-react"
 
 export function AlertDemo() {
+  const containerVariants = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.08 } },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 14 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] } },
+  }
+
   return (
-    <section id="demo" className="border-t border-border py-20 md:py-32">
+    <motion.section
+      id="demo"
+      className="border-t border-border py-20 md:py-32"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+    >
       <div className="mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -15,9 +32,17 @@ export function AlertDemo() {
           </p>
         </div>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-2">
+        <motion.div
+          className="mt-16 grid gap-8 md:grid-cols-2"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
           {/* Alert Card */}
-          <div className="group relative">
+          <motion.div
+            className="group relative transition-transform hover:-translate-y-1 hover:shadow-md"
+            variants={itemVariants}
+          >
             <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-b from-primary/20 to-transparent opacity-0 blur transition-opacity group-hover:opacity-100" />
             <div className="relative overflow-hidden rounded-xl border border-primary/50 bg-card">
               <div className="border-b border-border bg-primary/5 px-6 py-4">
@@ -65,10 +90,13 @@ export function AlertDemo() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Recovery Card */}
-          <div className="group relative">
+          <motion.div
+            className="group relative transition-transform hover:-translate-y-1 hover:shadow-md"
+            variants={itemVariants}
+          >
             <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-b from-emerald-500/20 to-transparent opacity-0 blur transition-opacity group-hover:opacity-100" />
             <div className="relative overflow-hidden rounded-xl border border-emerald-500/50 bg-card">
               <div className="border-b border-border bg-emerald-500/5 px-6 py-4">
@@ -112,9 +140,9 @@ export function AlertDemo() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }
