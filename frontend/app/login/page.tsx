@@ -32,10 +32,12 @@ function LoginForm() {
         await signup(email, password)
         const { access_token } = await login(email, password)
         setAccessToken(access_token)
+        localStorage.setItem("user_email", email)
         window.location.href = "/setup"
       } else {
         const { access_token } = await login(email, password)
         setAccessToken(access_token)
+        localStorage.setItem("user_email", email)
         window.location.href = "/dashboard"
       }
     } catch (err: any) {

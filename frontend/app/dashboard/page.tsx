@@ -120,8 +120,15 @@ export default function DashboardPage() {
   const [recentIncidents, setRecentIncidents] = useState<Incident[]>([])
   const [showEmptyState, setShowEmptyState] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
+  const [userInitials, setUserInitials] = useState("U")
 
   useEffect(() => {
+    const email = localStorage.getItem("user_email")
+    if (email) {
+      setUserInitials(email.split("@")[0].substring(0, 2).toUpperCase())
+    }
+
     const token = getAccessToken()
     if (!token) {
       window.location.href = "/login"
@@ -223,15 +230,38 @@ export default function DashboardPage() {
             >
               <Bell className="h-5 w-5" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <Settings className="h-5 w-5" />
-            </Button>
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowSettings(!showSettings)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+              {showSettings && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowSettings(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-2 w-36 z-50 rounded-md border border-border bg-card p-1 shadow-md">
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("user_email");
+                        window.location.href = "/login";
+                      }}
+                      className="w-full text-left rounded-sm px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
             <div className="ml-2 h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-sm font-medium text-primary">JD</span>
+              <span className="text-sm font-medium text-primary">{userInitials}</span>
             </div>
           </div>
         </div>
