@@ -39,4 +39,4 @@ def init(
     config.debug = debug
 
     from .sender import start_sender
-    start_sender()
+    start_sender()  

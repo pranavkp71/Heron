@@ -1,8 +1,10 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
+import { signup, login } from "@/lib/heron-api"
+import { setAccessToken } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,6 +13,7 @@ import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 
 function LoginForm() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [isSignUp, setIsSignUp] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
@@ -24,11 +27,22 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsLoading(false)
-    // Redirect to setup or dashboard
-    window.location.href = isSignUp ? "/setup" : "/dashboard"
+    try {
+      if (isSignUp) {
+        await signup(email, password)
+        const { access_token } = await login(email, password)
+        setAccessToken(access_token)
+        window.location.href = "/setup"
+      } else {
+        const { access_token } = await login(email, password)
+        setAccessToken(access_token)
+        window.location.href = "/dashboard"
+      }
+    } catch (err: any) {
+      alert(err.message || "Authentication failed")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -234,7 +248,11 @@ function LoginForm() {
                 {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
                 <button
                   type="button"
-                  onClick={() => setIsSignUp(!isSignUp)}
+                  onClick={() => {
+                    const newValue = !isSignUp
+                    setIsSignUp(newValue)
+                    router.replace(newValue ? '/login?signup=true' : '/login', { scroll: false })
+                  }}
                   className="font-medium text-primary transition-colors hover:text-primary/80"
                 >
                   {isSignUp ? "Sign in" : "Sign up"}

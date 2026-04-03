@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { fetchActiveIncidents, fetchAllIncidents, BackendIncident } from "@/lib/heron-api"
+import { getAccessToken, getApiKey } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { animate, motion } from "framer-motion"
 import {
@@ -114,9 +116,59 @@ function CountUpFloat({
 }
 
 export default function DashboardPage() {
-  const [activeIncidents] = useState<Incident[]>(mockActiveIncidents)
-  const [recentIncidents] = useState<Incident[]>(mockRecentIncidents)
-  const [showEmptyState, setShowEmptyState] = useState(false)
+  const [activeIncidents, setActiveIncidents] = useState<Incident[]>([])
+  const [recentIncidents, setRecentIncidents] = useState<Incident[]>([])
+  const [showEmptyState, setShowEmptyState] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const token = getAccessToken()
+    if (!token) {
+      window.location.href = "/login"
+      return
+    }
+
+    const key = getApiKey()
+    if (!key) {
+      window.location.href = "/setup"
+      return
+    }
+
+    const loadData = async () => {
+      try {
+        const [activeRes, allRes] = await Promise.all([
+          fetchActiveIncidents(key),
+          fetchAllIncidents(key),
+        ])
+
+        const mapIncident = (inc: BackendIncident): Incident => ({
+          id: inc.started_at + inc.event_name,
+          event: inc.event_name,
+          status: inc.resolved_at ? "resolved" : "active",
+          startedAt: new Date(inc.started_at).toLocaleString(),
+          duration: inc.duration ? `${Math.round(inc.duration / 60)} min` : "0 min",
+          resolvedAt: inc.resolved_at ? new Date(inc.resolved_at).toLocaleString() : undefined,
+        })
+
+        const activeMapped = (activeRes.incidents || []).map(mapIncident)
+        const recentMapped = (allRes.incidents || []).map(mapIncident)
+
+        setActiveIncidents(activeMapped)
+        setRecentIncidents(recentMapped)
+        setShowEmptyState(activeMapped.length === 0 && recentMapped.length === 0)
+      } catch (err) {
+        console.error("Failed to fetch incidents", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadData()
+  }, [])
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Loading...</div>
+  }
 
   const listVariants = {
     hidden: {},
