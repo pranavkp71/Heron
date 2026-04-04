@@ -1,6 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
+from datetime import datetime
 from app.services.event_service import store_events
 from app.database import get_connection
+from app.dependencies import get_current_user
 
 router = APIRouter()
 
@@ -33,3 +36,28 @@ def validate_api_key(api_key):
     )
 
     return cursor.fetchone()
+
+class TestEventRequest(BaseModel):
+    event_name: str
+
+@router.post("/v1/events/test")
+async def test_event(payload: TestEventRequest, current_user: dict = Depends(get_current_user)):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT api_key FROM projects WHERE user_id=%s LIMIT 1", (current_user["id"],))
+    row = cursor.fetchone()
+    if not row:
+        return {"error": "Project not found"}
+    
+    api_key = row[0]
+    
+    event_data = {
+        "event_name": payload.event_name,
+        "timestamp": int(datetime.utcnow().timestamp()),
+        "service": "api",
+        "environment": "test",
+        "metadata": {"test_event": True}
+    }
+    
+    store_events(api_key, [event_data])
+    return {"status": "stored", "event_name": payload.event_name}

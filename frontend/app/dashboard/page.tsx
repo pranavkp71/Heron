@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { fetchActiveIncidents, fetchAllIncidents, BackendIncident } from "@/lib/heron-api"
+import { fetchActiveIncidents, fetchAllIncidents, BackendIncident, sendTestEvent } from "@/lib/heron-api"
 import { getAccessToken, getApiKey } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { animate, motion } from "framer-motion"
@@ -122,6 +122,54 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [userInitials, setUserInitials] = useState("U")
+  const [isSendingEvent, setIsSendingEvent] = useState(false)
+
+  const loadData = async () => {
+    try {
+      const key = getApiKey()
+      if (!key) return
+
+      const [activeRes, allRes] = await Promise.all([
+        fetchActiveIncidents(key),
+        fetchAllIncidents(key),
+      ])
+
+      const mapIncident = (inc: BackendIncident): Incident => ({
+        id: inc.started_at + inc.event_name,
+        event: inc.event_name,
+        status: inc.resolved_at ? "resolved" : "active",
+        startedAt: new Date(inc.started_at).toLocaleString(),
+        duration: inc.duration ? `${Math.round(inc.duration / 60)} min` : "0 min",
+        resolvedAt: inc.resolved_at ? new Date(inc.resolved_at).toLocaleString() : undefined,
+      })
+
+      const activeMapped = (activeRes.incidents || []).map(mapIncident)
+      const recentMapped = (allRes.incidents || []).map(mapIncident)
+
+      setActiveIncidents(activeMapped)
+      setRecentIncidents(recentMapped)
+      setShowEmptyState(activeMapped.length === 0 && recentMapped.length === 0)
+    } catch (err) {
+      console.error("Failed to fetch incidents", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleAddEvent = async () => {
+    const eventName = window.prompt("Enter event name to simulate (e.g. payment.completed, user.signup, email.sent):", "payment.completed")
+    if (!eventName) return
+
+    setIsSendingEvent(true)
+    try {
+      await sendTestEvent(eventName)
+      await loadData()
+    } catch (err) {
+      console.error("Failed to send test event", err)
+    } finally {
+      setIsSendingEvent(false)
+    }
+  }
 
   useEffect(() => {
     const email = localStorage.getItem("user_email")
@@ -139,35 +187,6 @@ export default function DashboardPage() {
     if (!key) {
       window.location.href = "/setup"
       return
-    }
-
-    const loadData = async () => {
-      try {
-        const [activeRes, allRes] = await Promise.all([
-          fetchActiveIncidents(key),
-          fetchAllIncidents(key),
-        ])
-
-        const mapIncident = (inc: BackendIncident): Incident => ({
-          id: inc.started_at + inc.event_name,
-          event: inc.event_name,
-          status: inc.resolved_at ? "resolved" : "active",
-          startedAt: new Date(inc.started_at).toLocaleString(),
-          duration: inc.duration ? `${Math.round(inc.duration / 60)} min` : "0 min",
-          resolvedAt: inc.resolved_at ? new Date(inc.resolved_at).toLocaleString() : undefined,
-        })
-
-        const activeMapped = (activeRes.incidents || []).map(mapIncident)
-        const recentMapped = (allRes.incidents || []).map(mapIncident)
-
-        setActiveIncidents(activeMapped)
-        setRecentIncidents(recentMapped)
-        setShowEmptyState(activeMapped.length === 0 && recentMapped.length === 0)
-      } catch (err) {
-        console.error("Failed to fetch incidents", err)
-      } finally {
-        setIsLoading(false)
-      }
     }
 
     loadData()
@@ -289,8 +308,16 @@ export default function DashboardPage() {
             >
               Toggle Demo
             </Button>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Plus className="mr-2 h-4 w-4" />
+            <Button
+              onClick={handleAddEvent}
+              disabled={isSendingEvent}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {isSendingEvent ? (
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+              ) : (
+                <Plus className="mr-2 h-4 w-4" />
+              )}
               Add Event
             </Button>
           </div>

@@ -1,6 +1,6 @@
 import { getAccessToken } from "./auth";
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://127.0.0.1:8000";
 
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
     const token = getAccessToken();
@@ -80,5 +80,15 @@ export async function fetchActiveIncidents(apiKey: string) {
 export async function fetchAllIncidents(apiKey: string) {
     return fetchWithAuth(`/v1/incidents?api_key=${encodeURIComponent(apiKey)}`, {
         method: "GET",
+    });
+}
+
+export async function sendTestEvent(eventName: string) {
+    return fetchWithAuth("/v1/events/test", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ event_name: eventName }),
     });
 }
