@@ -5,7 +5,7 @@ import Link from "next/link"
 import { fetchActiveIncidents, fetchAllIncidents, BackendIncident, sendTestEvent } from "@/lib/heron-api"
 import { getAccessToken, getApiKey } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
-import { animate, motion } from "framer-motion"
+import { animate, motion, AnimatePresence } from "framer-motion"
 import {
   Select,
   SelectContent,
@@ -123,6 +123,15 @@ export default function DashboardPage() {
   const [showSettings, setShowSettings] = useState(false)
   const [userInitials, setUserInitials] = useState("U")
   const [isSendingEvent, setIsSendingEvent] = useState(false)
+  const [localRecentEvents, setLocalRecentEvents] = useState<{ name: string; timestamp: number }[]>([])
+  const [showWaitingText, setShowWaitingText] = useState(false)
+  const [toastMessage, setToastMessage] = useState("")
+  const [tick, setTick] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => setTick(t => t + 1), 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   const loadData = async () => {
     try {
@@ -163,6 +172,12 @@ export default function DashboardPage() {
     setIsSendingEvent(true)
     try {
       await sendTestEvent(eventName)
+
+      setLocalRecentEvents(prev => [{ name: eventName, timestamp: Date.now() }, ...prev].slice(0, 5))
+      setShowWaitingText(true)
+      setToastMessage("Event sent successfully")
+      setTimeout(() => setToastMessage(""), 3000)
+
       await loadData()
     } catch (err) {
       console.error("Failed to send test event", err)
@@ -301,6 +316,11 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {showWaitingText && (
+              <span className="text-xs text-muted-foreground animate-pulse mr-2">
+                Waiting to detect silence...
+              </span>
+            )}
             <Button
               variant="outline"
               onClick={() => setShowEmptyState(!showEmptyState)}
@@ -318,10 +338,36 @@ export default function DashboardPage() {
               ) : (
                 <Plus className="mr-2 h-4 w-4" />
               )}
-              Add Event
+              Send Test Event
             </Button>
           </div>
         </motion.div>
+
+        {/* Local Recent Events */}
+        {localRecentEvents.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="mt-6 overflow-hidden rounded-xl border border-border bg-card p-5"
+          >
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
+              <Activity className="h-4 w-4 text-muted-foreground" />
+              Recent Simulated Events
+            </h3>
+            <div className="space-y-2">
+              {localRecentEvents.map((ev, i) => {
+                const seconds = Math.floor((Date.now() - ev.timestamp) / 1000) + tick * 0;
+                const timeStr = seconds < 60 ? `${Math.max(1, seconds)} sec ago` : `${Math.floor(seconds / 60)} min ago`;
+                return (
+                  <div key={i} className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">{ev.name}</span>
+                    <span className="text-xs text-muted-foreground/60">{timeStr}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </motion.div>
+        )}
 
         {showEmptyState ? (
           /* Empty State */
@@ -616,6 +662,20 @@ export default function DashboardPage() {
           </>
         )}
       </main>
+
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 50, x: "-50%" }}
+            className="fixed bottom-6 left-1/2 z-50 rounded-full bg-emerald-500/10 px-4 py-2 border border-emerald-500/20 shadow-lg"
+          >
+            <span className="text-sm font-medium text-emerald-500">{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
