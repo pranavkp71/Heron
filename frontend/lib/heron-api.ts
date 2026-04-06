@@ -92,3 +92,9 @@ export async function sendTestEvent(eventName: string) {
         body: JSON.stringify({ event_name: eventName }),
     });
 }
+
+export async function fetchStats(apiKey: string) {
+    return fetchWithAuth(`/v1/stats?api_key=${encodeURIComponent(apiKey)}`, {
+        method: "GET",
+    });
+}

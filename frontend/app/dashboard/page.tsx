@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { fetchActiveIncidents, fetchAllIncidents, BackendIncident, sendTestEvent } from "@/lib/heron-api"
+import { fetchActiveIncidents, fetchAllIncidents, BackendIncident, sendTestEvent, fetchStats } from "@/lib/heron-api"
 import { getAccessToken, getApiKey } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { animate, motion, AnimatePresence } from "framer-motion"
@@ -135,6 +135,8 @@ export default function DashboardPage() {
   const [toastMessage, setToastMessage] = useState("")
   const [tick, setTick] = useState(0)
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
+  const [totalEvents, setTotalEvents] = useState<number>(0)
+  const [avgResolutionMin, setAvgResolutionMin] = useState<number | null>(null)
 
   useEffect(() => {
     const interval = setInterval(() => setTick(t => t + 1), 1000)
@@ -146,26 +148,58 @@ export default function DashboardPage() {
       const key = getApiKey()
       if (!key) return
 
-      const [activeRes, allRes] = await Promise.all([
+      const [activeRes, allRes, statsRes] = await Promise.all([
         fetchActiveIncidents(key),
         fetchAllIncidents(key),
+        fetchStats(key),
       ])
 
-      const mapIncident = (inc: BackendIncident): Incident => ({
-        id: inc.started_at + inc.event_name,
+      const now = Date.now()
+
+      const formatDuration = (startedAtRaw: string | Date, resolvedAtRaw?: string | Date | null, durationSec?: number | null): string => {
+        if (resolvedAtRaw && durationSec != null) {
+          const mins = Math.round(durationSec / 60)
+          if (mins < 60) return `${mins} min`
+          return `${Math.floor(mins / 60)}h ${mins % 60}m`
+        }
+        // active incident: compute from now
+        const started = new Date(startedAtRaw).getTime()
+        const elapsedSec = Math.floor((now - started) / 1000)
+        if (elapsedSec < 60) return "Just now"
+        const mins = Math.floor(elapsedSec / 60)
+        if (mins < 60) return `${mins}m`
+        return `${Math.floor(mins / 60)}h ${mins % 60}m`
+      }
+
+      const mapActive = (inc: BackendIncident): Incident => ({
+        id: String(inc.started_at) + inc.event_name,
         event: inc.event_name,
-        status: inc.resolved_at ? "resolved" : "active",
+        status: "active",
         startedAt: new Date(inc.started_at).toLocaleString(),
-        duration: inc.duration ? `${Math.round(inc.duration / 60)} min` : "0 min",
+        duration: formatDuration(inc.started_at),
+        resolvedAt: undefined,
+      })
+
+      // all incidents from backend include both active+resolved; filter to resolved only for recent
+      const mapResolved = (inc: BackendIncident): Incident => ({
+        id: String(inc.started_at) + inc.event_name,
+        event: inc.event_name,
+        status: "resolved",
+        startedAt: new Date(inc.started_at).toLocaleString(),
+        duration: formatDuration(inc.started_at, inc.resolved_at, inc.duration),
         resolvedAt: inc.resolved_at ? new Date(inc.resolved_at).toLocaleString() : undefined,
       })
 
-      const activeMapped = (activeRes.incidents || []).map(mapIncident)
-      const recentMapped = (allRes.incidents || []).map(mapIncident)
+      const activeMapped = (activeRes.incidents || []).map(mapActive)
+      const recentMapped = (allRes.incidents || [])
+        .filter((inc: BackendIncident) => inc.resolved_at != null)
+        .map(mapResolved)
 
       setActiveIncidents(activeMapped)
       setRecentIncidents(recentMapped)
       setShowEmptyState(activeMapped.length === 0 && recentMapped.length === 0)
+      setTotalEvents(statsRes.total_events ?? 0)
+      setAvgResolutionMin(statsRes.avg_resolution_minutes ?? null)
     } catch (err) {
       console.error("Failed to fetch incidents", err)
     } finally {
@@ -644,10 +678,10 @@ export default function DashboardPage() {
                     <Activity className="h-5 w-5 text-emerald-500" />
                   </div>
                   <p className="mt-2 text-3xl font-bold text-foreground">
-                    <CountUpInt value={12847} />
+                    <CountUpInt value={totalEvents} />
                   </p>
-                  <p className="mt-1 text-xs text-emerald-500">
-                    +23% from last week
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Total events recorded
                   </p>
                 </motion.div>
 
@@ -662,10 +696,14 @@ export default function DashboardPage() {
                     <Clock className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <p className="mt-2 text-3xl font-bold text-foreground">
-                    <CountUpFloat value={4.2} decimals={1} suffix=" min" />
+                    {avgResolutionMin != null ? (
+                      <CountUpFloat value={avgResolutionMin} decimals={1} suffix=" min" />
+                    ) : (
+                      <span>—</span>
+                    )}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Time to resolution
+                    Avg time to resolution
                   </p>
                 </motion.div>
               </motion.div>
@@ -725,7 +763,9 @@ export default function DashboardPage() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <span className="font-medium text-muted-foreground">Message:</span>
-                <span className="col-span-3 text-red-500">Event stopped firing</span>
+                <span className={`col-span-3 ${selectedIncident.status === 'active' ? 'text-red-500' : 'text-emerald-500'}`}>
+                  {selectedIncident.status === 'active' ? 'Event stopped firing' : 'Event resumed'}
+                </span>
               </div>
             </div>
           )}
