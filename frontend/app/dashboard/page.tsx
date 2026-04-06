@@ -14,6 +14,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   AlertTriangle,
   CheckCircle2,
   Clock,
@@ -127,6 +134,7 @@ export default function DashboardPage() {
   const [showWaitingText, setShowWaitingText] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
   const [tick, setTick] = useState(0)
+  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
 
   useEffect(() => {
     const interval = setInterval(() => setTick(t => t + 1), 1000)
@@ -486,6 +494,7 @@ export default function DashboardPage() {
                             variant="outline"
                             size="sm"
                             className="border-border text-foreground hover:bg-secondary"
+                            onClick={() => setSelectedIncident(incident)}
                           >
                             View Details
                             <ChevronDown className="ml-1 h-4 w-4" />
@@ -515,9 +524,10 @@ export default function DashboardPage() {
                 <Button
                   variant="ghost"
                   size="sm"
+                  asChild
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  View All
+                  <Link href="/incidents">View All</Link>
                 </Button>
               </div>
 
@@ -580,6 +590,7 @@ export default function DashboardPage() {
                             variant="ghost"
                             size="sm"
                             className="text-muted-foreground hover:text-foreground"
+                            onClick={() => setSelectedIncident(incident)}
                           >
                             Details
                           </Button>
@@ -676,6 +687,50 @@ export default function DashboardPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Incident Details Modal */}
+      <Dialog open={!!selectedIncident} onOpenChange={(open) => !open && setSelectedIncident(null)}>
+        <DialogContent className="sm:max-w-[425px] border-border bg-card">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Incident Details</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Detailed view of the specific business event failure.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedIncident && (
+            <div className="grid gap-4 py-4 text-sm text-foreground">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium text-muted-foreground">Event:</span>
+                <span className="col-span-3 font-semibold">{selectedIncident.event}</span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <span className={`col-span-3 capitalize font-medium ${selectedIncident.status === 'active' ? 'text-primary' : 'text-emerald-500'}`}>
+                  {selectedIncident.status}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium text-muted-foreground">Started:</span>
+                <span className="col-span-3">{selectedIncident.startedAt}</span>
+              </div>
+              {selectedIncident.resolvedAt && (
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <span className="font-medium text-muted-foreground">Resolved:</span>
+                  <span className="col-span-3">{selectedIncident.resolvedAt}</span>
+                </div>
+              )}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium text-muted-foreground">Duration:</span>
+                <span className="col-span-3">{selectedIncident.duration}</span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium text-muted-foreground">Message:</span>
+                <span className="col-span-3 text-red-500">Event stopped firing</span>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </motion.div>
   )
 }

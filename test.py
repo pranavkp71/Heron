@@ -1,14 +1,14 @@
 import requests
 import time
 
-API_KEY = "heronc829226824aa333f2587b59ea1991ce9"
+API_KEY = "heron13f5a2274b71521955ccd8bea1099c33"
 
-for i in range(5):
+for i in range(20):
     payload = {
         "api_key": API_KEY,
         "events": [
             {
-                "event_name": "lockup.event",
+                "event_name": "email.event",
                 "service": "api",
                 "environment": "production",
                 "timestamp": int(time.time())
@@ -19,7 +19,7 @@ for i in range(5):
     res = requests.post("http://localhost:8000/v1/events", json=payload)
     print(res.json())
 
-    time.sleep(10)
+    time.sleep(5)
 
 
 
