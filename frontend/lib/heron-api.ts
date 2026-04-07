@@ -71,14 +71,14 @@ export type BackendIncident = {
     duration: number | null;
 };
 
-export async function fetchActiveIncidents(apiKey: string) {
-    return fetchWithAuth(`/v1/incidents/active?api_key=${encodeURIComponent(apiKey)}`, {
+export async function fetchActiveIncidents() {
+    return fetchWithAuth(`/v1/incidents/active`, {
         method: "GET",
     });
 }
 
-export async function fetchAllIncidents(apiKey: string) {
-    return fetchWithAuth(`/v1/incidents?api_key=${encodeURIComponent(apiKey)}`, {
+export async function fetchAllIncidents() {
+    return fetchWithAuth(`/v1/incidents`, {
         method: "GET",
     });
 }
@@ -93,8 +93,8 @@ export async function sendTestEvent(eventName: string) {
     });
 }
 
-export async function fetchStats(apiKey: string) {
-    return fetchWithAuth(`/v1/stats?api_key=${encodeURIComponent(apiKey)}`, {
+export async function fetchStats() {
+    return fetchWithAuth(`/v1/stats`, {
         method: "GET",
     });
 }

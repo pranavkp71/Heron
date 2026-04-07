@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { fetchAllIncidents, BackendIncident } from "@/lib/heron-api"
-import { getAccessToken, getApiKey } from "@/lib/auth"
+import { getAccessToken } from "@/lib/auth"
 import { motion } from "framer-motion"
 import {
     Activity,
@@ -31,15 +31,9 @@ export default function IncidentsPage() {
             return
         }
 
-        const key = getApiKey()
-        if (!key) {
-            window.location.href = "/setup"
-            return
-        }
-
         const loadData = async () => {
             try {
-                const allRes = await fetchAllIncidents(key)
+                const allRes = await fetchAllIncidents()
 
                 const mapIncident = (inc: BackendIncident): Incident => ({
                     id: inc.started_at + inc.event_name,

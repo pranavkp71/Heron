@@ -60,19 +60,20 @@ def resolve_incident(api_key, event_name, service, environment):
 
     return duration
 
-def get_all_incidents(api_key):
 
+def get_all_incidents(user_id: int):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
-        SELECT event_name, service, environment, started_at, resolved_at, duration
-        FROM incidents
-        WHERE api_key=%s
-        ORDER BY started_at DESC
+        SELECT i.event_name, i.service, i.environment, i.started_at, i.resolved_at, i.duration
+        FROM incidents i
+        JOIN projects p ON i.api_key = p.api_key
+        WHERE p.user_id = %s
+        ORDER BY i.started_at DESC
         """,
-        (api_key,)
+        (user_id,)
     )
 
     rows = cursor.fetchall()
@@ -91,19 +92,20 @@ def get_all_incidents(api_key):
 
     return incidents
 
-def get_active_incidents(api_key):
 
+def get_active_incidents(user_id: int):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
-        SELECT event_name, service, environment, started_at
-        FROM incidents
-        WHERE api_key=%s AND resolved_at IS NULL
-        ORDER BY started_at DESC
+        SELECT i.event_name, i.service, i.environment, i.started_at
+        FROM incidents i
+        JOIN projects p ON i.api_key = p.api_key
+        WHERE p.user_id = %s AND i.resolved_at IS NULL
+        ORDER BY i.started_at DESC
         """,
-        (api_key,)
+        (user_id,)
     )
 
     rows = cursor.fetchall()

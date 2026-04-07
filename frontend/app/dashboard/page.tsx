@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { fetchActiveIncidents, fetchAllIncidents, BackendIncident, sendTestEvent, fetchStats } from "@/lib/heron-api"
-import { getAccessToken, getApiKey } from "@/lib/auth"
+import { getAccessToken } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { animate, motion, AnimatePresence } from "framer-motion"
 import {
@@ -145,13 +145,10 @@ export default function DashboardPage() {
 
   const loadData = async () => {
     try {
-      const key = getApiKey()
-      if (!key) return
-
       const [activeRes, allRes, statsRes] = await Promise.all([
-        fetchActiveIncidents(key),
-        fetchAllIncidents(key),
-        fetchStats(key),
+        fetchActiveIncidents(),
+        fetchAllIncidents(),
+        fetchStats(),
       ])
 
       const now = Date.now()
@@ -237,12 +234,6 @@ export default function DashboardPage() {
     const token = getAccessToken()
     if (!token) {
       window.location.href = "/login"
-      return
-    }
-
-    const key = getApiKey()
-    if (!key) {
-      window.location.href = "/setup"
       return
     }
 
