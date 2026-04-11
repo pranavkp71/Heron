@@ -18,11 +18,34 @@ type Incident = {
     startedAt: string
     duration: string
     resolvedAt?: string
+    rawStartedAt?: string
 }
 
 export default function IncidentsPage() {
     const [incidents, setIncidents] = useState<Incident[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [tick, setTick] = useState(0)
+
+    const formatDuration = (startedAtRaw: string | Date, resolvedAtRaw?: string | Date | null, durationSec?: number | null): string => {
+        if (resolvedAtRaw && durationSec != null) {
+            const mins = Math.round(durationSec / 60)
+            if (mins < 60) return `${mins} min`
+            return `${Math.floor(mins / 60)}h ${mins % 60}m`
+        }
+        // active incident: compute from now
+        const now = Date.now()
+        const started = new Date(startedAtRaw).getTime()
+        const elapsedSec = Math.floor((now - started) / 1000)
+        if (elapsedSec < 60) return "Just now"
+        const mins = Math.floor(elapsedSec / 60)
+        if (mins < 60) return `${mins}m`
+        return `${Math.floor(mins / 60)}h ${mins % 60}m`
+    }
+
+    useEffect(() => {
+        const interval = setInterval(() => setTick(t => t + 1), 1000)
+        return () => clearInterval(interval)
+    }, [])
 
     useEffect(() => {
         const token = getAccessToken()
@@ -40,8 +63,9 @@ export default function IncidentsPage() {
                     event: inc.event_name,
                     status: inc.resolved_at ? "resolved" : "active",
                     startedAt: new Date(inc.started_at).toLocaleString(),
-                    duration: inc.duration ? `${Math.round(inc.duration / 60)} min` : "0 min",
+                    duration: inc.resolved_at ? (inc.duration ? `${Math.round(inc.duration / 60)} min` : "0 min") : formatDuration(inc.started_at),
                     resolvedAt: inc.resolved_at ? new Date(inc.resolved_at).toLocaleString() : undefined,
+                    rawStartedAt: inc.started_at,
                 })
 
                 const mapped = (allRes.incidents || []).map(mapIncident)
@@ -150,7 +174,7 @@ export default function IncidentsPage() {
                                         )}
                                     </td>
                                     <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
-                                        {incident.duration}
+                                        {incident.status === "active" && incident.rawStartedAt ? formatDuration(incident.rawStartedAt) : incident.duration}
                                     </td>
                                     <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                                         {incident.startedAt}

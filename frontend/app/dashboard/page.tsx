@@ -39,6 +39,7 @@ type Incident = {
   startedAt: string
   duration: string
   resolvedAt?: string
+  rawStartedAt?: string
 }
 
 const mockActiveIncidents: Incident[] = [
@@ -138,6 +139,22 @@ export default function DashboardPage() {
   const [totalEvents, setTotalEvents] = useState<number>(0)
   const [avgResolutionMin, setAvgResolutionMin] = useState<number | null>(null)
 
+  const formatDuration = (startedAtRaw: string | Date, resolvedAtRaw?: string | Date | null, durationSec?: number | null): string => {
+    if (resolvedAtRaw && durationSec != null) {
+      const mins = Math.round(durationSec / 60)
+      if (mins < 60) return `${mins} min`
+      return `${Math.floor(mins / 60)}h ${mins % 60}m`
+    }
+    // active incident: compute from now
+    const now = Date.now()
+    const started = new Date(startedAtRaw).getTime()
+    const elapsedSec = Math.floor((now - started) / 1000)
+    if (elapsedSec < 60) return "Just now"
+    const mins = Math.floor(elapsedSec / 60)
+    if (mins < 60) return `${mins}m`
+    return `${Math.floor(mins / 60)}h ${mins % 60}m`
+  }
+
   useEffect(() => {
     const interval = setInterval(() => setTick(t => t + 1), 1000)
     return () => clearInterval(interval)
@@ -151,23 +168,6 @@ export default function DashboardPage() {
         fetchStats(),
       ])
 
-      const now = Date.now()
-
-      const formatDuration = (startedAtRaw: string | Date, resolvedAtRaw?: string | Date | null, durationSec?: number | null): string => {
-        if (resolvedAtRaw && durationSec != null) {
-          const mins = Math.round(durationSec / 60)
-          if (mins < 60) return `${mins} min`
-          return `${Math.floor(mins / 60)}h ${mins % 60}m`
-        }
-        // active incident: compute from now
-        const started = new Date(startedAtRaw).getTime()
-        const elapsedSec = Math.floor((now - started) / 1000)
-        if (elapsedSec < 60) return "Just now"
-        const mins = Math.floor(elapsedSec / 60)
-        if (mins < 60) return `${mins}m`
-        return `${Math.floor(mins / 60)}h ${mins % 60}m`
-      }
-
       const mapActive = (inc: BackendIncident): Incident => ({
         id: String(inc.started_at) + inc.event_name,
         event: inc.event_name,
@@ -175,6 +175,7 @@ export default function DashboardPage() {
         startedAt: new Date(inc.started_at).toLocaleString(),
         duration: formatDuration(inc.started_at),
         resolvedAt: undefined,
+        rawStartedAt: inc.started_at,
       })
 
       // all incidents from backend include both active+resolved; filter to resolved only for recent
@@ -355,13 +356,6 @@ export default function DashboardPage() {
               </span>
             )}
             <Button
-              variant="outline"
-              onClick={() => setShowEmptyState(!showEmptyState)}
-              className="border-border text-foreground hover:bg-secondary"
-            >
-              Toggle Demo
-            </Button>
-            <Button
               onClick={handleAddEvent}
               disabled={isSendingEvent}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -512,7 +506,7 @@ export default function DashboardPage() {
                               Duration
                             </p>
                             <p className="text-sm font-medium text-primary">
-                              {incident.duration}
+                              {incident.rawStartedAt ? formatDuration(incident.rawStartedAt) : incident.duration}
                             </p>
                           </div>
                           <Button

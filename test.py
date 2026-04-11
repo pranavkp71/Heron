@@ -8,9 +8,9 @@ for i in range(20):
         "api_key": API_KEY,
         "events": [
             {
-                "event_name": "signup.event",
+                "event_name": "payment.event",
                 "service": "api",
-                "environment": "production",
+                "environment": "developement",
                 "timestamp": int(time.time())
             }
         ]

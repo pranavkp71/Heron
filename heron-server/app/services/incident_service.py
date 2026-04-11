@@ -1,5 +1,5 @@
 from app.database import get_connection
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def create_incident(api_key, event_name, service, environment):
@@ -85,8 +85,8 @@ def get_all_incidents(user_id: int):
             "event_name": row[0],
             "service": row[1],
             "environment": row[2],
-            "started_at": row[3],
-            "resolved_at": row[4],
+            "started_at": row[3].replace(tzinfo=timezone.utc) if row[3] else None,
+            "resolved_at": row[4].replace(tzinfo=timezone.utc) if row[4] else None,
             "duration": row[5],
         })
 
@@ -117,7 +117,7 @@ def get_active_incidents(user_id: int):
             "event_name": row[0],
             "service": row[1],
             "environment": row[2],
-            "started_at": row[3],
+            "started_at": row[3].replace(tzinfo=timezone.utc) if row[3] else None,
         })
 
     return incidents
