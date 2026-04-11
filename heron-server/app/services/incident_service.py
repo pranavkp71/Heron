@@ -61,20 +61,32 @@ def resolve_incident(api_key, event_name, service, environment):
     return duration
 
 
-def get_all_incidents(user_id: int):
+def get_all_incidents(user_id: int, environment: str = None):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        SELECT i.event_name, i.service, i.environment, i.started_at, i.resolved_at, i.duration
-        FROM incidents i
-        JOIN projects p ON i.api_key = p.api_key
-        WHERE p.user_id = %s
-        ORDER BY i.started_at DESC
-        """,
-        (user_id,)
-    )
+    if environment:
+        cursor.execute(
+            """
+            SELECT i.event_name, i.service, i.environment, i.started_at, i.resolved_at, i.duration
+            FROM incidents i
+            JOIN projects p ON i.api_key = p.api_key
+            WHERE p.user_id = %s AND i.environment = %s
+            ORDER BY i.started_at DESC
+            """,
+            (user_id, environment)
+        )
+    else:
+        cursor.execute(
+            """
+            SELECT i.event_name, i.service, i.environment, i.started_at, i.resolved_at, i.duration
+            FROM incidents i
+            JOIN projects p ON i.api_key = p.api_key
+            WHERE p.user_id = %s
+            ORDER BY i.started_at DESC
+            """,
+            (user_id,)
+        )
 
     rows = cursor.fetchall()
 
@@ -93,20 +105,32 @@ def get_all_incidents(user_id: int):
     return incidents
 
 
-def get_active_incidents(user_id: int):
+def get_active_incidents(user_id: int, environment: str = None):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        SELECT i.event_name, i.service, i.environment, i.started_at
-        FROM incidents i
-        JOIN projects p ON i.api_key = p.api_key
-        WHERE p.user_id = %s AND i.resolved_at IS NULL
-        ORDER BY i.started_at DESC
-        """,
-        (user_id,)
-    )
+    if environment:
+        cursor.execute(
+            """
+            SELECT i.event_name, i.service, i.environment, i.started_at
+            FROM incidents i
+            JOIN projects p ON i.api_key = p.api_key
+            WHERE p.user_id = %s AND i.resolved_at IS NULL AND i.environment = %s
+            ORDER BY i.started_at DESC
+            """,
+            (user_id, environment)
+        )
+    else:
+        cursor.execute(
+            """
+            SELECT i.event_name, i.service, i.environment, i.started_at
+            FROM incidents i
+            JOIN projects p ON i.api_key = p.api_key
+            WHERE p.user_id = %s AND i.resolved_at IS NULL
+            ORDER BY i.started_at DESC
+            """,
+            (user_id,)
+        )
 
     rows = cursor.fetchall()
 

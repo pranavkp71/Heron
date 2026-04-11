@@ -138,6 +138,7 @@ export default function DashboardPage() {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null)
   const [totalEvents, setTotalEvents] = useState<number>(0)
   const [avgResolutionMin, setAvgResolutionMin] = useState<number | null>(null)
+  const [environment, setEnvironment] = useState("production")
 
   const formatDuration = (startedAtRaw: string | Date, resolvedAtRaw?: string | Date | null, durationSec?: number | null): string => {
     if (resolvedAtRaw && durationSec != null) {
@@ -163,9 +164,9 @@ export default function DashboardPage() {
   const loadData = async () => {
     try {
       const [activeRes, allRes, statsRes] = await Promise.all([
-        fetchActiveIncidents(),
-        fetchAllIncidents(),
-        fetchStats(),
+        fetchActiveIncidents(environment),
+        fetchAllIncidents(environment),
+        fetchStats(environment),
       ])
 
       const mapActive = (inc: BackendIncident): Incident => ({
@@ -239,7 +240,7 @@ export default function DashboardPage() {
     }
 
     loadData()
-  }, [])
+  }, [environment])
 
   if (isLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Loading...</div>
@@ -277,15 +278,15 @@ export default function DashboardPage() {
               </span>
             </Link>
 
-            {/* Project Selector */}
-            <Select defaultValue="project-1">
+            {/* Environment Selector */}
+            <Select value={environment} onValueChange={setEnvironment}>
               <SelectTrigger className="w-[180px] border-border bg-secondary text-foreground">
-                <SelectValue placeholder="Select project" />
+                <SelectValue placeholder="Select environment" />
               </SelectTrigger>
               <SelectContent className="border-border bg-card">
-                <SelectItem value="project-1">Production</SelectItem>
-                <SelectItem value="project-2">Staging</SelectItem>
-                <SelectItem value="project-3">Development</SelectItem>
+                <SelectItem value="production">Production</SelectItem>
+                <SelectItem value="staging">Staging</SelectItem>
+                <SelectItem value="development">Development</SelectItem>
               </SelectContent>
             </Select>
           </div>

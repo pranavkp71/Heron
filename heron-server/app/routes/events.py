@@ -18,12 +18,29 @@ async def receive_events(payload: dict):
     api_key = payload.get("api_key")
     events = payload.get("events", [])
 
+    for ev in events:
+        ev["environment"] = normalize_environment(ev.get("environment"))
+
     store_events(api_key, events)
 
     return {
         "status": "stored",
         "count": len(events)
     }
+
+def normalize_environment(env: str) -> str:
+    if not env:
+        return "development"
+    
+    env = env.strip().lower()
+    if env in ("prod", "production"):
+        return "production"
+    if env in ("stage", "staging", "stg"):
+        return "staging"
+    if env in ("development", "developement", "dev", "test"):
+        return "development"
+        
+    return "development"
 
 def validate_api_key(api_key):
 
@@ -55,7 +72,7 @@ async def test_event(payload: TestEventRequest, current_user: dict = Depends(get
         "event_name": payload.event_name,
         "timestamp": int(datetime.utcnow().timestamp()),
         "service": "api",
-        "environment": "test",
+        "environment": "development",
         "metadata": {"test_event": True}
     }
     

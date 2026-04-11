@@ -71,14 +71,16 @@ export type BackendIncident = {
     duration: number | null;
 };
 
-export async function fetchActiveIncidents() {
-    return fetchWithAuth(`/v1/incidents/active`, {
+export async function fetchActiveIncidents(environment?: string) {
+    const url = environment ? `/v1/incidents/active?environment=${encodeURIComponent(environment)}` : `/v1/incidents/active`;
+    return fetchWithAuth(url, {
         method: "GET",
     });
 }
 
-export async function fetchAllIncidents() {
-    return fetchWithAuth(`/v1/incidents`, {
+export async function fetchAllIncidents(environment?: string) {
+    const url = environment ? `/v1/incidents?environment=${encodeURIComponent(environment)}` : `/v1/incidents`;
+    return fetchWithAuth(url, {
         method: "GET",
     });
 }
@@ -93,8 +95,9 @@ export async function sendTestEvent(eventName: string) {
     });
 }
 
-export async function fetchStats() {
-    return fetchWithAuth(`/v1/stats`, {
+export async function fetchStats(environment?: string) {
+    const url = environment ? `/v1/stats?environment=${encodeURIComponent(environment)}` : `/v1/stats`;
+    return fetchWithAuth(url, {
         method: "GET",
     });
 }
