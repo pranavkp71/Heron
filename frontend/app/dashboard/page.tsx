@@ -40,6 +40,7 @@ type Incident = {
   duration: string
   resolvedAt?: string
   rawStartedAt?: string
+  rawResolvedAt?: string
 }
 
 const mockActiveIncidents: Incident[] = [
@@ -129,7 +130,9 @@ export default function DashboardPage() {
   const [showEmptyState, setShowEmptyState] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
   const [userInitials, setUserInitials] = useState("U")
+  const [userEmail, setUserEmail] = useState("")
   const [isSendingEvent, setIsSendingEvent] = useState(false)
   const [localRecentEvents, setLocalRecentEvents] = useState<{ name: string; timestamp: number }[]>([])
   const [showWaitingText, setShowWaitingText] = useState(false)
@@ -187,6 +190,7 @@ export default function DashboardPage() {
         startedAt: new Date(inc.started_at).toLocaleString(),
         duration: formatDuration(inc.started_at, inc.resolved_at, inc.duration),
         resolvedAt: inc.resolved_at ? new Date(inc.resolved_at).toLocaleString() : undefined,
+        rawResolvedAt: inc.resolved_at || undefined,
       })
 
       const activeMapped = (activeRes.incidents || []).map(mapActive)
@@ -230,6 +234,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const email = localStorage.getItem("user_email")
     if (email) {
+      setUserEmail(email)
       setUserInitials(email.split("@")[0].substring(0, 2).toUpperCase())
     }
 
@@ -259,6 +264,29 @@ export default function DashboardPage() {
       transition: { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] },
     },
   }
+
+  const notifications = [
+    ...activeIncidents.map(inc => {
+      const timeStr = inc.rawStartedAt ? formatDuration(inc.rawStartedAt) : inc.duration;
+      return {
+        id: inc.id,
+        title: `${inc.event} stopped`,
+        time: timeStr === "Just now" ? timeStr : `${timeStr} ago`,
+        rawTime: new Date(inc.rawStartedAt || 0).getTime(),
+        type: "active" as const
+      }
+    }),
+    ...recentIncidents.map(inc => {
+      const timeStr = inc.rawResolvedAt ? formatDuration(inc.rawResolvedAt) : "recently";
+      return {
+        id: inc.id,
+        title: `${inc.event} resumed`,
+        time: timeStr === "Just now" ? timeStr : (timeStr === "recently" ? "recently" : `${timeStr} ago`),
+        rawTime: new Date(inc.rawResolvedAt || 0).getTime(),
+        type: "resolved" as const
+      }
+    })
+  ].sort((a, b) => b.rawTime - a.rawTime).slice(0, 5)
 
   return (
     <motion.div
@@ -292,45 +320,74 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <Bell className="h-5 w-5" />
-            </Button>
             <div className="relative">
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setShowSettings(!showSettings)}
+                onClick={() => setShowNotifications(!showNotifications)}
                 className="text-muted-foreground hover:text-foreground"
               >
-                <Settings className="h-5 w-5" />
+                <div className="relative">
+                  <Bell className="h-5 w-5" />
+                  {activeIncidents.length > 0 && (
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary" />
+                  )}
+                </div>
               </Button>
+              {showNotifications && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowNotifications(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-2 w-72 z-50 rounded-md border border-border bg-card p-2 shadow-md">
+                    <h3 className="text-sm font-semibold text-foreground px-2 py-1.5 mb-1 border-b border-border">Recent Alerts</h3>
+                    <div className="space-y-1 max-h-[300px] overflow-y-auto">
+                      {notifications.length > 0 ? notifications.map((n) => (
+                        <div key={n.id} className="text-sm px-2 py-2 rounded-sm hover:bg-secondary">
+                          <span className={n.type === 'active' ? 'font-medium text-primary' : 'text-foreground'}>{n.title}</span>
+                          <p className="text-xs text-muted-foreground mt-0.5">{n.time}</p>
+                        </div>
+                      )) : (
+                        <div className="text-sm px-2 py-3 text-muted-foreground text-center">No recent alerts</div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="relative ml-2">
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center hover:ring-2 hover:ring-primary/50 transition-all focus:outline-none"
+              >
+                <span className="text-sm font-medium text-primary">{userInitials}</span>
+              </button>
               {showSettings && (
                 <>
                   <div
                     className="fixed inset-0 z-40"
                     onClick={() => setShowSettings(false)}
                   />
-                  <div className="absolute right-0 top-full mt-2 w-36 z-50 rounded-md border border-border bg-card p-1 shadow-md">
+                  <div className="absolute right-0 top-full mt-2 w-48 z-50 rounded-md border border-border bg-card p-1 shadow-md">
+                    <div className="px-3 py-2 border-b border-border mb-1">
+                      <p className="text-sm font-medium text-foreground truncate">{userEmail || "User"}</p>
+                    </div>
+                    <div className="h-px bg-border my-1" />
                     <button
                       onClick={() => {
                         localStorage.removeItem("token");
                         localStorage.removeItem("user_email");
                         window.location.href = "/login";
                       }}
-                      className="w-full text-left rounded-sm px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
+                      className="w-full text-left rounded-sm px-3 py-2 text-sm text-red-500 hover:bg-secondary transition-colors"
                     >
                       Logout
                     </button>
                   </div>
                 </>
               )}
-            </div>
-            <div className="ml-2 h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-sm font-medium text-primary">{userInitials}</span>
             </div>
           </div>
         </div>
