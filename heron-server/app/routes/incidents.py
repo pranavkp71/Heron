@@ -32,19 +32,19 @@ def fetch_stats(environment: Optional[str] = None, current_user: dict = Depends(
     if environment:
         cursor.execute(
             """
-            SELECT COUNT(*)
-            FROM events e
-            JOIN projects p ON e.api_key = p.api_key
-            WHERE p.user_id = %s AND e.environment = %s
+            SELECT COALESCE(SUM(es.event_count), 0)
+            FROM event_stats es
+            JOIN projects p ON es.api_key = p.api_key
+            WHERE p.user_id = %s AND es.environment = %s
             """,
             (current_user["id"], environment)
         )
     else:
         cursor.execute(
             """
-            SELECT COUNT(*)
-            FROM events e
-            JOIN projects p ON e.api_key = p.api_key
+            SELECT COALESCE(SUM(es.event_count), 0)
+            FROM event_stats es
+            JOIN projects p ON es.api_key = p.api_key
             WHERE p.user_id = %s
             """,
             (current_user["id"],)
