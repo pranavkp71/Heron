@@ -8,7 +8,7 @@ for i in range(20):
         "api_key": API_KEY,
         "events": [
             {
-                "event_name": "email.event",
+                "event_name": "signup.event",
                 "service": "api",
                 "environment": "production",
                 "timestamp": int(time.time())

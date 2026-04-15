@@ -124,6 +124,19 @@ function CountUpFloat({
   return <>{display.toFixed(decimals)}{suffix}</>
 }
 
+function formatMinutes(totalMinutes: number): string {
+  const mins = Math.round(totalMinutes)
+  if (mins < 60) return `${mins}m`
+  const hours = Math.floor(mins / 60)
+  const remainingMins = mins % 60
+  if (hours < 24) return remainingMins > 0 ? `${hours}h ${remainingMins}m` : `${hours}h`
+  const days = Math.floor(hours / 24)
+  const remainingHours = hours % 24
+  if (remainingHours === 0 && remainingMins === 0) return `${days}d`
+  if (remainingMins === 0) return `${days}d ${remainingHours}h`
+  return `${days}d ${remainingHours}h ${remainingMins}m`
+}
+
 export default function DashboardPage() {
   const [activeIncidents, setActiveIncidents] = useState<Incident[]>([])
   const [recentIncidents, setRecentIncidents] = useState<Incident[]>([])
@@ -740,7 +753,7 @@ export default function DashboardPage() {
                   </div>
                   <p className="mt-2 text-3xl font-bold text-foreground">
                     {avgResolutionMin != null ? (
-                      <CountUpFloat value={avgResolutionMin} decimals={1} suffix=" min" />
+                      formatMinutes(avgResolutionMin)
                     ) : (
                       <span>—</span>
                     )}
