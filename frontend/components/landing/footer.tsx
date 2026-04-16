@@ -15,8 +15,9 @@ const footerLinks = {
     { label: "Issue", href: "#" },
   ],
   legal: [
-    { label: "Privacy", href: "#" },
-    { label: "Terms", href: "#" },
+    { label: "Privacy", href: "/privacy" },
+    { label: "Terms", href: "/terms" },
+    { label: "License", href: "https://opensource.org/licenses/MIT" },
   ],
 }
 
