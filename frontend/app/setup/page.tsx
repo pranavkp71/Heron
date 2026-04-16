@@ -19,10 +19,11 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 
 const steps = [
-  { id: 1, title: "Create Project", icon: Key },
-  { id: 2, title: "Add SDK", icon: Code },
-  { id: 3, title: "Add Slack", icon: MessageSquare },
-  { id: 4, title: "Done", icon: Rocket },
+  { id: 1, title: "Create Project", icon: Rocket },
+  { id: 2, title: "API Key", icon: Key },
+  { id: 3, title: "Add SDK", icon: Code },
+  { id: 4, title: "Add Slack", icon: MessageSquare },
+  { id: 5, title: "Done", icon: Check },
 ]
 
 export default function SetupPage() {
@@ -70,13 +71,13 @@ heron.track("payment.completed")`
       } finally {
         setIsLoading(false)
       }
-    } else if (currentStep === 3) {
+    } else if (currentStep === 4) {
       if (slackWebhook) {
         setIsLoading(true)
         try {
           await updateSlackWebhook(slackWebhook)
           directionRef.current = 1
-          setCurrentStep(4)
+          setCurrentStep(5)
         } catch (err: any) {
           alert(err.message || "Failed to save webhook")
         } finally {
@@ -84,9 +85,9 @@ heron.track("payment.completed")`
         }
       } else {
         directionRef.current = 1
-        setCurrentStep(4)
+        setCurrentStep(5)
       }
-    } else if (currentStep < 4) {
+    } else if (currentStep < 5) {
       directionRef.current = 1
       setCurrentStep(currentStep + 1)
     } else {
@@ -156,10 +157,10 @@ heron.track("payment.completed")`
                 <div className="flex flex-col items-center">
                   <motion.div
                     className={`flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all ${currentStep > step.id
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : currentStep === step.id
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border bg-card text-muted-foreground"
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : currentStep === step.id
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card text-muted-foreground"
                       }`}
                     animate={{
                       scale:
@@ -178,8 +179,8 @@ heron.track("payment.completed")`
                   </motion.div>
                   <span
                     className={`mt-2 text-xs font-medium ${currentStep >= step.id
-                        ? "text-foreground"
-                        : "text-muted-foreground"
+                      ? "text-foreground"
+                      : "text-muted-foreground"
                       }`}
                   >
                     {step.title}
@@ -204,26 +205,16 @@ heron.track("payment.completed")`
               <motion.div
                 key="step-1"
                 className="p-8"
-                initial={{
-                  opacity: 0,
-                  x: stepDir > 0 ? 24 : -24,
-                  y: 10,
-                  scale: 0.99,
-                }}
+                initial={{ opacity: 0, x: stepDir > 0 ? 24 : -24, y: 10, scale: 0.99 }}
                 animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                exit={{
-                  opacity: 0,
-                  x: stepDir > 0 ? -24 : 24,
-                  y: 10,
-                  scale: 0.99,
-                }}
+                exit={{ opacity: 0, x: stepDir > 0 ? -24 : 24, y: 10, scale: 0.99 }}
                 transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
               >
                 <h2 className="text-2xl font-bold text-foreground">
                   Create your project
                 </h2>
                 <p className="mt-2 text-muted-foreground">
-                  Your project is ready. Here&apos;s your API key to get started.
+                  Give your project a name to get started.
                 </p>
 
                 <div className="mt-8 space-y-6">
@@ -235,7 +226,28 @@ heron.track("payment.completed")`
                       className="h-11 bg-secondary border-border text-foreground"
                     />
                   </div>
+                </div>
+              </motion.div>
+            )}
 
+            {/* Step 2: API Key */}
+            {currentStep === 2 && (
+              <motion.div
+                key="step-2"
+                className="p-8"
+                initial={{ opacity: 0, x: stepDir > 0 ? 24 : -24, y: 10, scale: 0.99 }}
+                animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                exit={{ opacity: 0, x: stepDir > 0 ? -24 : 24, y: 10, scale: 0.99 }}
+                transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+              >
+                <h2 className="text-2xl font-bold text-foreground">
+                  Save your API Key
+                </h2>
+                <p className="mt-2 text-muted-foreground">
+                  This is your API key. Use it to send events from your application.
+                </p>
+
+                <div className="mt-8 space-y-6">
                   <div className="space-y-2">
                     <Label className="text-foreground">API Key</Label>
                     <div className="flex gap-2">
@@ -295,10 +307,10 @@ heron.track("payment.completed")`
               </motion.div>
             )}
 
-            {/* Step 2: Add SDK */}
-            {currentStep === 2 && (
+            {/* Step 3: Add SDK */}
+            {currentStep === 3 && (
               <motion.div
-                key="step-2"
+                key="step-3"
                 className="p-8"
                 initial={{
                   opacity: 0,
@@ -400,10 +412,10 @@ heron.track("payment.completed")`
               </motion.div>
             )}
 
-            {/* Step 3: Add Slack */}
-            {currentStep === 3 && (
+            {/* Step 4: Add Slack */}
+            {currentStep === 4 && (
               <motion.div
-                key="step-3"
+                key="step-4"
                 className="p-8"
                 initial={{
                   opacity: 0,
@@ -476,10 +488,10 @@ heron.track("payment.completed")`
               </motion.div>
             )}
 
-            {/* Step 4: Done */}
-            {currentStep === 4 && (
+            {/* Step 5: Done */}
+            {currentStep === 5 && (
               <motion.div
-                key="step-4"
+                key="step-5"
                 className="p-8 text-center"
                 initial={{
                   opacity: 0,
@@ -550,7 +562,7 @@ heron.track("payment.completed")`
               disabled={isLoading}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {isLoading ? "Please wait..." : currentStep === 4 ? "Go to Dashboard" : "Continue"}
+              {isLoading ? "Please wait..." : currentStep === 5 ? "Go to Dashboard" : "Continue"}
               {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
             </Button>
           </div>
