@@ -18,6 +18,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -29,6 +30,11 @@ function LoginForm() {
     setIsLoading(true)
     try {
       if (isSignUp) {
+        if (password !== confirmPassword) {
+          alert("Passwords do not match")
+          setIsLoading(false)
+          return
+        }
         await signup(email, password)
         const { access_token } = await login(email, password)
         setAccessToken(access_token)
@@ -68,22 +74,39 @@ function LoginForm() {
             </Link>
           </div>
 
-          <div className="relative space-y-6">
-            <blockquote className="space-y-4">
-              <p className="text-2xl font-medium leading-relaxed text-foreground">
-                &ldquo;Heron caught a payment processing issue that our entire
-                monitoring stack missed. It saved us thousands in lost
-                revenue.&rdquo;
+          <div className="relative space-y-8">
+            <div className="space-y-3">
+              <h2 className="text-2xl font-medium leading-normal text-foreground">
+                Know when your business silently breaks
+              </h2>
+              <p className="text-muted-foreground leading-relaxed text-sm">
+                Heron detects when critical events stop happening, even if your servers and systems look completely healthy.
               </p>
-              <footer className="text-muted-foreground">
-                <p className="font-semibold text-foreground">Sarah Chen</p>
-                <p>Engineering Lead, Acme Inc</p>
-              </footer>
-            </blockquote>
+            </div>
+
+            <div className="rounded-xl border border-border bg-secondary/30 p-6 font-mono text-sm shadow-sm space-y-4">
+              <div className="font-semibold text-red-500/90 dark:text-red-400 flex items-center gap-2">
+                🚨 Heron alert
+              </div>
+              <div className="space-y-3 text-muted-foreground text-xs sm:text-sm">
+                <div className="flex justify-between border-b border-border/50 pb-2">
+                  <span>Event</span>
+                  <span className="text-foreground font-medium">payment.completed</span>
+                </div>
+                <div className="flex justify-between border-b border-border/50 pb-2">
+                  <span>Last seen</span>
+                  <span className="text-foreground font-medium">18 minutes ago</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Expected interval</span>
+                  <span className="text-foreground font-medium">~3 minutes</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="relative text-sm text-muted-foreground">
-            Know when your business silently breaks.
+            Prevent silent failures and protect your revenue.
           </div>
         </div>
 
@@ -176,6 +199,25 @@ function LoginForm() {
                     </button>
                   </div>
                 </div>
+
+                {isSignUp && (
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-foreground">
+                      Confirm Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="confirmPassword"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Confirm your password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required={isSignUp}
+                        className="h-11 pr-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <Button
                   type="submit"
