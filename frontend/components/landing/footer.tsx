@@ -9,15 +9,14 @@ const footerLinks = {
     { label: "How it works", href: "#how-it-works" },
     { label: "Documentation", href: "/setup" },
   ],
-  company: [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Contact", href: "#" },
+  opensource: [
+    { label: "Github", href: "https://github.com/pranavkp71/Heron" },
+    { label: "Contributing", href: "#" },
+    { label: "Issue", href: "#" },
   ],
   legal: [
     { label: "Privacy", href: "#" },
     { label: "Terms", href: "#" },
-    { label: "Security", href: "#" },
   ],
 }
 
@@ -78,9 +77,9 @@ export function Footer() {
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <h3 className="text-sm font-semibold text-foreground">Company</h3>
+            <h3 className="text-sm font-semibold text-foreground">Open Source</h3>
             <ul className="mt-4 space-y-3">
-              {footerLinks.company.map((link) => (
+              {footerLinks.opensource.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}

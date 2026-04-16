@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 
 // ─── Nav structure ──────────────────────────────────────────────────────────
@@ -395,9 +395,8 @@ function FlowDiagram() {
     return (
         <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 4, margin: "1.25rem 0" }}>
             {nodes.map((n, i) => (
-                <>
+                <React.Fragment key={n.label}>
                     <div
-                        key={n.label}
                         style={{
                             background: n.accent ? "var(--heron-accent-light)" : "hsl(var(--secondary))",
                             border: `0.5px solid ${n.accent ? "#9FE1CB" : "hsl(var(--border))"}`,
@@ -415,7 +414,7 @@ function FlowDiagram() {
                             →
                         </span>
                     )}
-                </>
+                </React.Fragment>
             ))}
         </div>
     )
