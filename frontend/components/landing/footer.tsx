@@ -7,13 +7,11 @@ const footerLinks = {
   product: [
     { label: "Features", href: "#features" },
     { label: "How it works", href: "#how-it-works" },
-    { label: "Pricing", href: "#pricing" },
     { label: "Documentation", href: "/setup" },
   ],
   company: [
     { label: "About", href: "#" },
     { label: "Blog", href: "#" },
-    { label: "Careers", href: "#" },
     { label: "Contact", href: "#" },
   ],
   legal: [
@@ -118,7 +116,7 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <Link
-              href="#"
+              href="https://x.com/pranavk_p"
               className="text-muted-foreground transition-colors hover:text-foreground"
             >
               <span className="sr-only">Twitter</span>
@@ -127,7 +125,7 @@ export function Footer() {
               </svg>
             </Link>
             <Link
-              href="#"
+              href="https://github.com/pranavkp71/Heron"
               className="text-muted-foreground transition-colors hover:text-foreground"
             >
               <span className="sr-only">GitHub</span>

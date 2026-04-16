@@ -28,7 +28,7 @@ export function FinalCTA() {
               Start monitoring your business flows today
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground">
-              Join hundreds of teams who trust Heron to catch the silent
+              Open source event monitoring to catch the silent
               failures that traditional monitoring misses.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">

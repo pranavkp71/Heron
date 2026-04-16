@@ -43,12 +43,6 @@ export function Navbar() {
           >
             Features
           </Link>
-          <Link
-            href="#pricing"
-            className="relative text-sm text-muted-foreground transition-colors hover:text-foreground after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full after:rounded-full after:bg-primary/70 after:content-[''] after:origin-left after:scale-x-0 after:transition-transform after:duration-200 hover:after:scale-x-100"
-          >
-            Pricing
-          </Link>
         </div>
 
         <div className="flex items-center gap-3">
