@@ -67,9 +67,6 @@ Getting started with Heron is designed to be completely frictionless.
 Instrumenting a business event only takes a single line of code!
 
 ```python
-import sys
-sys.path.append("/path/to/heron-sdk")
-
 import heron
 
 # Initialize the SDK with your project key
