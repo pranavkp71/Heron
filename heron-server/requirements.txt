@@ -14,7 +14,6 @@ ecdsa==0.19.2
 email_validator==2.2.0
 fastapi==0.135.1
 h11==0.16.0
-heron @ file:///home/pranav/Desktop/MyFiles/Python/Projects/Personal/Heron_main/heron
 id==1.6.1
 idna==3.11
 iniconfig==2.3.0
