@@ -16,7 +16,7 @@ for i in range(20):
         ]
     }
 
-    res = requests.post("http://localhost:8000/v1/events", json=payload)
+    res = requests.post("https://heron-production.up.railway.app/v1/events", json=payload)
     print(res.json())
 
     time.sleep(5)

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 
 // ─── Nav structure ──────────────────────────────────────────────────────────
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const NAV = [
     {
@@ -770,7 +771,7 @@ export default function DocsPage() {
                                     <>
                                         <Pre><code>python run.py</code></Pre>
                                         <p style={{ color: "hsl(var(--muted-foreground))", marginTop: 4 }}>
-                                            Server runs at <Code>http://localhost:8000</Code>.
+                                            Server runs at <Code>{baseUrl}</Code>.
                                         </p>
                                     </>
                                 ),
@@ -779,7 +780,7 @@ export default function DocsPage() {
                                 title: "Create a project and get your API key",
                                 content: (
                                     <>
-                                        <Pre><code>{`curl -X POST "http://localhost:8000/v1/projects?name=MyApp"`}</code></Pre>
+                                        <Pre><code>{`curl -X POST "${baseUrl}/v1/projects?name=MyApp"`}</code></Pre>
                                         <Pre><code><span className="c-muted"># Response</span>{"\n"}{"{"}{"\n"}  <span className="c-key">"project_id"</span>: 1,{"\n"}  <span className="c-key">"api_key"</span>: <span className="c-str">"heron_xxxxx"</span>{"\n"}{"}"}</code></Pre>
                                     </>
                                 ),
@@ -823,7 +824,7 @@ export default function DocsPage() {
                         </p>
                         <Pre><code>python run.py</code></Pre>
                         <p style={{ color: "hsl(var(--muted-foreground))", marginBottom: "1rem" }}>
-                            The server starts at <Code>http://localhost:8000</Code>. It runs a background monitor that periodically checks for silent events and opens or resolves incidents.
+                            The server starts at <Code>{baseUrl}</Code>. It runs a background monitor that periodically checks for silent events and opens or resolves incidents.
                         </p>
                         <Callout warning>
                             <strong>Note:</strong> You must configure your database connection before starting the server. Check your <Code>.env</Code> or config file for the database URL setting.
@@ -840,7 +841,7 @@ export default function DocsPage() {
                         <p style={{ color: "hsl(var(--muted-foreground))", marginBottom: "1rem" }}>
                             Each project gets its own API key. Use separate projects to isolate different apps or environments.
                         </p>
-                        <Pre><code>{`curl -X POST "http://localhost:8000/v1/projects?name=MyApp"`}</code></Pre>
+                        <Pre><code>{`curl -X POST "${baseUrl}/v1/projects?name=MyApp"`}</code></Pre>
                         <Pre><code>{"{"}{"\n"}  <span className="c-key">"project_id"</span>: 1,{"\n"}  <span className="c-key">"api_key"</span>: <span className="c-str">"heron_xxxxx"</span>{"\n"}{"}"}</code></Pre>
                         <p style={{ color: "hsl(var(--muted-foreground))" }}>
                             Store the <Code>api_key</Code> securely — it authenticates all SDK calls and API requests for this project.
@@ -866,7 +867,7 @@ export default function DocsPage() {
                                 title: "Add the webhook to your project",
                                 content: (
                                     <>
-                                        <Pre><code>{`curl -X PATCH "http://localhost:8000/v1/projects/1/slack" \\\n  -H "Content-Type: application/json" \\\n  -d '{"slack_webhook_url": "https://hooks.slack.com/..."}'`}</code></Pre>
+                                        <Pre><code>{`curl -X PATCH "${baseUrl}/v1/projects/1/slack" \\\n  -H "Content-Type: application/json" \\\n  -d '{"slack_webhook_url": "https://hooks.slack.com/..."}'`}</code></Pre>
                                         <p style={{ color: "hsl(var(--muted-foreground))", marginTop: 4 }}>Once set, Heron will automatically post alerts when incidents open or resolve.</p>
                                     </>
                                 ),
@@ -938,12 +939,12 @@ export default function DocsPage() {
                         </p>
 
                         <Endpoint method="GET" path="/v1/incidents" description="Returns all incidents (open and resolved) for your project.">
-                            <Pre><code>{`curl "http://localhost:8000/v1/incidents?api_key=heron_xxxxx"`}</code></Pre>
+                            <Pre><code>{`curl "${baseUrl}/v1/incidents?api_key=heron_xxxxx"`}</code></Pre>
                             <Pre><code>[{"\n"}  {"{"}{"\n"}    <span className="c-key">"id"</span>: 1,{"\n"}    <span className="c-key">"event_name"</span>: <span className="c-str">"payment.completed"</span>,{"\n"}    <span className="c-key">"service"</span>: <span className="c-str">"payments-service"</span>,{"\n"}    <span className="c-key">"environment"</span>: <span className="c-str">"production"</span>,{"\n"}    <span className="c-key">"started_at"</span>: <span className="c-str">"2024-11-01T14:22:00Z"</span>,{"\n"}    <span className="c-key">"resolved_at"</span>: <span className="c-str">"2024-11-01T14:40:00Z"</span>,{"\n"}    <span className="c-key">"duration"</span>: 1080{"\n"}  {"}"}{"\n"}]</code></Pre>
                         </Endpoint>
 
                         <Endpoint method="GET" path="/v1/incidents/active" description="Returns only currently open incidents. Useful for status dashboards or health checks.">
-                            <Pre><code>{`curl "http://localhost:8000/v1/incidents/active?api_key=heron_xxxxx"`}</code></Pre>
+                            <Pre><code>{`curl "${baseUrl}/v1/incidents/active?api_key=heron_xxxxx"`}</code></Pre>
                             <Pre><code>[{"\n"}  {"{"}{"\n"}    <span className="c-key">"id"</span>: 3,{"\n"}    <span className="c-key">"event_name"</span>: <span className="c-str">"email.sent"</span>,{"\n"}    <span className="c-key">"service"</span>: <span className="c-str">"notifications"</span>,{"\n"}    <span className="c-key">"started_at"</span>: <span className="c-str">"2024-11-01T15:10:00Z"</span>,{"\n"}    <span className="c-key">"resolved_at"</span>: null,{"\n"}    <span className="c-key">"duration"</span>: null{"\n"}  {"}"}{"\n"}]</code></Pre>
                         </Endpoint>
                     </section>
@@ -999,7 +1000,7 @@ export default function DocsPage() {
                                 },
                                 {
                                     q: "The SDK is not connecting to the server",
-                                    a: <>Check that your Heron server is running at <Code>http://localhost:8000</Code> and that there are no firewall rules blocking the connection. The SDK fails silently by design — check your server logs to confirm events are being received.</>,
+                                    a: <>Check that your Heron server is running at <Code>{baseUrl}</Code> and that there are no firewall rules blocking the connection. The SDK fails silently by design — check your server logs to confirm events are being received.</>,
                                 },
                                 {
                                     q: "Database connection errors on startup",
