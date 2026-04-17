@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 
 // ─── Nav structure ──────────────────────────────────────────────────────────
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
 
 const NAV = [
     {

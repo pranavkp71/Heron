@@ -68,7 +68,7 @@ Getting started with the Heron backend server is designed to be completely frict
    ```bash
    python run.py
    ```
-   The backend will be live at `http://localhost:8000`.
+   The backend will be live at the URL specified in your configuration.
 
 ---
 

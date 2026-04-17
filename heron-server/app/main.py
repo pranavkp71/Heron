@@ -12,8 +12,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",
-        "https://heron-rose.vercel.app"
+        os.getenv("FRONTEND_URL", "https://heron-rose.vercel.app"),
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -1,6 +1,8 @@
+import os
+
 class HeronConfig:
     api_key = None
-    endpoint = "http://127.0.0.1:8000/v1/events"
+    endpoint = os.getenv("HERON_ENDPOINT", "https://heron-production.up.railway.app/v1/events")
     environment = "production"
     service = "app"
     debug = False
@@ -11,9 +13,9 @@ config = HeronConfig()
 
 def init(
     api_key: str,
-    endpoint: str = "http://127.0.0.1:8000/v1/events",
-    environment: str = "production",
-    service: str = "app",
+    endpoint: str = os.getenv("HERON_ENDPOINT", "https://heron-production.up.railway.app/v1/events"),
+    environment: str = os.getenv("HERON_ENVIRONMENT", "production"),
+    service: str = os.getenv("HERON_SERVICE", "app"),
     debug: bool = False
 ):
     """
@@ -23,7 +25,7 @@ def init(
 
     Args:
         api_key:     Your Heron project API key
-        endpoint:    Heron backend URL (default: localhost for development)
+        endpoint:    Heron backend URL
         environment: 'production', 'staging', or 'development'
         service:     Name of this service (e.g. 'api', 'worker', 'payments')
         debug:       Print SDK activity to console if True

@@ -37,7 +37,7 @@ Ensure you have set up a PostgreSQL database as outlined in the `README.md`. Onc
 ```bash
 python run.py
 ```
-The server should now be running at `http://localhost:8000`.
+The server should now be running.
 
 ---
 
