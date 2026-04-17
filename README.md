@@ -36,9 +36,19 @@ Your App → Heron SDK → Heron Server → Pattern Learning → Silence Detecti
 
 ---
 
+## Installation
+
+Install the Heron Python SDK via pip:
+
+```bash
+pip install getheron
+```
+
+---
+
 ## Quick Start
 
-Getting started with Heron is designed to be completely frictionless.
+Getting started with the Heron backend server is designed to be completely frictionless.
 
 1. **Clone the repository:**
    ```bash

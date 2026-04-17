@@ -26,6 +26,11 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+*(Optional)* To install the SDK natively for testing or external use, you can also run:
+```bash
+pip install getheron
+```
+
 **3. Run the server**
 Ensure you have set up a PostgreSQL database as outlined in the `README.md`. Once the database is ready:
 
