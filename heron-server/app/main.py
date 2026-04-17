@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes.events import router as event_router
 from app.routes.auth import router as auth_router
 import threading
+import os
 from app.worker import run_worker
 from app.routes import projects
 from app.routes import incidents
@@ -12,7 +13,9 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        os.getenv("FRONTEND_URL", "https://heron-rose.vercel.app"),
+        "http://localhost:3000",
+        "https://heron-rose.vercel.app",
+        "https://heron-rose.vercel.app/",
     ],
     allow_credentials=True,
     allow_methods=["*"],
