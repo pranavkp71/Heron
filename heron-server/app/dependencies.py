@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from app.utils.security import decode_access_token
-from app.database import get_connection
+from app.database import db_connection
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/auth/login")
 
@@ -18,10 +18,10 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
 
     user_id = int(payload.get("sub"))
 
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, email FROM users WHERE id = %s", (user_id,))
-    user = cursor.fetchone()
+    with db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, email FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
 
     if not user:
         raise HTTPException(
@@ -31,3 +31,4 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
         )
 
     return {"id": user[0], "email": user[1]}
+

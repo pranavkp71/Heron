@@ -1,14 +1,11 @@
-from app.database import get_connection
+from app.database import db_connection
 from psycopg2.extras import Json
 from app.services.event_stats_service import update_event_stats
 
+
 def store_events(api_key, events):
-
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    try:
-
+    with db_connection() as conn:
+        cursor = conn.cursor()
         for event in events:
             cursor.execute(
                 """
@@ -24,13 +21,7 @@ def store_events(api_key, events):
                     Json(event.get("metadata", {})),
                     event["timestamp"]
                 )
-            )  
-
+            )
             update_event_stats(api_key, event)
-        
-        conn.commit()
-    
-    except Exception as e:
 
-        conn.rollback()
-        raise e
+        conn.commit()
