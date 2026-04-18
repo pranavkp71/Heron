@@ -6,7 +6,7 @@ from datetime import datetime
 
 def send_slack_alert(message: str, webhook_url: str):
 
-    if not SLACK_WEBHOOK_URL:
+    if not webhook_url:
         print("No webhook for project")
         return
     
