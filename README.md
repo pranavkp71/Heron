@@ -1,3 +1,6 @@
+[![PyPI version](https://img.shields.io/pypi/v/getheron.svg)](https://pypi.org/project/getheron/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/getheron.svg)](https://pypi.org/project/getheron/)
+
 <p align="center">
   <img src="assets/heron-logo.png" width="100%" />
 </p>
