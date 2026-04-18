@@ -8,9 +8,19 @@ load_dotenv(find_dotenv())
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Thread-safe connection pool — safe for FastAPI + background worker threads.
-# min=1 keeps a warm connection alive; max=10 handles concurrent requests.
-_pool = psycopg2.pool.ThreadedConnectionPool(1, 10, DATABASE_URL)
+# Pool is created lazily on first use — this prevents a cold-start DB
+# connection failure from crashing the whole process at import time,
+# which would make Railway return 502 on every request (including OPTIONS).
+_pool = None
+
+
+def _get_pool():
+    global _pool
+    if _pool is None:
+        if not DATABASE_URL:
+            raise RuntimeError("DATABASE_URL environment variable is not set")
+        _pool = psycopg2.pool.ThreadedConnectionPool(1, 10, DATABASE_URL)
+    return _pool
 
 
 @contextmanager
@@ -25,26 +35,25 @@ def db_connection():
             cursor.execute(...)
             conn.commit()
     """
-    conn = _pool.getconn()
+    pool = _get_pool()
+    conn = pool.getconn()
     try:
         yield conn
     except Exception:
         conn.rollback()
         raise
     finally:
-        _pool.putconn(conn)
+        pool.putconn(conn)
 
 
 def get_connection():
     """
-    Legacy helper kept for backward compatibility.
-    Prefer db_connection() context manager for new code.
-    Returns a connection from the pool — caller is responsible for
-    calling release_connection() when done.
+    Legacy helper — prefer db_connection() context manager for new code.
+    Returns a connection from the pool; caller must call release_connection().
     """
-    return _pool.getconn()
+    return _get_pool().getconn()
 
 
 def release_connection(conn):
     """Return a connection obtained via get_connection() back to the pool."""
-    _pool.putconn(conn)
+    _get_pool().putconn(conn)
