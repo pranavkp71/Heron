@@ -1,5 +1,14 @@
 [![PyPI version](https://img.shields.io/pypi/v/getheron.svg)](https://pypi.org/project/getheron/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/getheron.svg)](https://pypi.org/project/getheron/)
+[![Python](https://img.shields.io/pypi/pyversions/getheron.svg)](https://pypi.org/project/getheron/)
+[![License](https://img.shields.io/github/license/pranavkp71/heron.svg)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/pranavkp71/heron.svg)](https://github.com/pranavkp71/heron/stargazers)
+[![Status](https://img.shields.io/badge/status-production-brightgreen)]()
+[![Build](https://img.shields.io/github/actions/workflow/status/pranavkp71/heron/ci.yml)](https://github.com/pranavkp71/heron/actions)
+[![Live](https://img.shields.io/badge/Live-Demo-green)](https://heron-rose.vercel.app)
+[![Monitoring](https://img.shields.io/badge/use--case-event_monitoring-blue)]()
+[![Alerts](https://img.shields.io/badge/alerts-slack-red)]()
+
 
 <p align="center">
   <img src="assets/heron-logo.png" width="100%" />
