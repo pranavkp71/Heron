@@ -47,7 +47,7 @@ rich==15.0.0
 rsa==4.9.1
 SecretStorage==3.5.0
 six==1.17.0
-starlette==0.52.1
+starlette==1.0.0
 twine==6.2.0
 typing-inspection==0.4.2
 typing_extensions==4.15.0
