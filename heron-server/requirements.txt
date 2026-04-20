@@ -37,7 +37,7 @@ Pygments==2.20.0
 pyproject_hooks==1.2.0
 pytest==9.0.3
 python-dotenv==1.2.2
-python-jose==3.3.0
+python-jose==3.4.0
 python-multipart==0.0.20
 readme_renderer==44.0
 requests==2.32.5
