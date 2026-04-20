@@ -1,14 +1,14 @@
 import requests
 import time
 
-API_KEY = "heron13f5a2274b71521955ccd8bea1099c33"
+API_KEY = "heronaab484777882db7e164e10901f01bbf4"
 
 for i in range(20):
     payload = {
         "api_key": API_KEY,
         "events": [
             {
-                "event_name": "email.event",
+                "event_name": "payment.event",
                 "service": "api",
                 "environment": "production",
                 "timestamp": int(time.time())

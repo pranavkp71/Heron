@@ -1,48 +1,55 @@
-export function setAccessToken(token: string) {
+function setCookie(name: string, value: string) {
     if (typeof window !== "undefined") {
-        localStorage.setItem("access_token", token);
+        document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=86400; SameSite=Lax; Secure`;
     }
+}
+
+function getCookie(name: string): string | null {
+    if (typeof window !== "undefined") {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        if (match) return decodeURIComponent(match[2]);
+    }
+    return null;
+}
+
+export function setAccessToken(token: string) {
+    setCookie("access_token", token);
 }
 
 export function getAccessToken(): string | null {
-    if (typeof window !== "undefined") {
-        return localStorage.getItem("access_token");
-    }
-    return null;
+    return getCookie("access_token");
 }
 
 export function setProjectId(projectId: string) {
-    if (typeof window !== "undefined") {
-        localStorage.setItem("project_id", projectId);
-    }
+    setCookie("project_id", projectId);
 }
 
 export function getProjectId(): string | null {
-    if (typeof window !== "undefined") {
-        return localStorage.getItem("project_id");
-    }
-    return null;
+    return getCookie("project_id");
 }
 
 export function setApiKey(apiKey: string) {
-    if (typeof window !== "undefined") {
-        localStorage.setItem("api_key", apiKey);
-    }
+    setCookie("api_key", apiKey);
 }
 
 export function getApiKey(): string | null {
-    if (typeof window !== "undefined") {
-        return localStorage.getItem("api_key");
-    }
-    return null;
+    return getCookie("api_key");
+}
+
+export function setUserEmail(email: string) {
+    setCookie("user_email", email);
+}
+
+export function getUserEmail(): string | null {
+    return getCookie("user_email");
 }
 
 export function logout() {
     if (typeof window !== "undefined") {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("project_id");
-        localStorage.removeItem("api_key");
-        localStorage.removeItem("user_email");
+        document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "project_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "api_key=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "user_email=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         window.location.href = "/login";
     }
 }

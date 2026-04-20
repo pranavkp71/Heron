@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { fetchActiveIncidents, fetchAllIncidents, BackendIncident, sendTestEvent, fetchStats } from "@/lib/heron-api"
-import { getAccessToken } from "@/lib/auth"
+import { getAccessToken, getUserEmail, logout } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { animate, motion, AnimatePresence } from "framer-motion"
 import {
@@ -245,7 +245,7 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    const email = localStorage.getItem("user_email")
+    const email = getUserEmail()
     if (email) {
       setUserEmail(email)
       setUserInitials(email.split("@")[0].substring(0, 2).toUpperCase())
@@ -389,11 +389,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="h-px bg-border my-1" />
                     <button
-                      onClick={() => {
-                        localStorage.removeItem("token");
-                        localStorage.removeItem("user_email");
-                        window.location.href = "/login";
-                      }}
+                      onClick={() => logout()}
                       className="w-full text-left rounded-sm px-3 py-2 text-sm text-red-500 hover:bg-secondary transition-colors"
                     >
                       Logout

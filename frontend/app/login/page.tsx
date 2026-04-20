@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { signup, login } from "@/lib/heron-api"
-import { setAccessToken } from "@/lib/auth"
+import { setAccessToken, setUserEmail } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -38,12 +38,12 @@ function LoginForm() {
         await signup(email, password)
         const { access_token } = await login(email, password)
         setAccessToken(access_token)
-        localStorage.setItem("user_email", email)
+        setUserEmail(email)
         window.location.href = "/setup"
       } else {
         const { access_token } = await login(email, password)
         setAccessToken(access_token)
-        localStorage.setItem("user_email", email)
+        setUserEmail(email)
         window.location.href = "/dashboard"
       }
     } catch (err: any) {
