@@ -15,7 +15,7 @@ email_validator==2.2.0
 fastapi==0.135.1
 h11==0.16.0
 id==1.6.1
-idna==3.11
+idna==3.13
 iniconfig==2.3.0
 jaraco.classes==3.4.0
 jaraco.context==6.1.2
